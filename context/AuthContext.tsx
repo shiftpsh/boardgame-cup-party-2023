@@ -1,4 +1,5 @@
 "use client";
+import { useGranularEffect } from "@/hooks/useGranularEffect";
 import { db } from "@/utils/database";
 import firebase from "@/utils/firebase";
 import { FirebaseError } from "firebase/app";
@@ -12,14 +13,7 @@ import {
     signInWithPopup,
 } from "firebase/auth";
 import { get, onValue, ref, set } from "firebase/database";
-import {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useRef,
-    useState,
-} from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useSnackbar } from "./SnackbarContext";
 
 interface AuthContextValues {
@@ -56,32 +50,39 @@ export const AuthContextProvider = ({
     provider.current = new GoogleAuthProvider();
   }, []);
 
-  const addListeners = useCallback(() => {
-    if (!auth.current) return () => {};
+  useGranularEffect(
+    () => {
+      if (!auth.current) return undefined;
 
-    const unsubscribeAuth = auth.current.onAuthStateChanged(async (user) => {
-      setUser(user);
-      if (user) {
-        try {
-          const value = await get(ref(db, `admin_emails/${user.uid}`));
-          const admin = value.exists();
-          if (admin) {
-            setIsAdmin(value.exists());
-          } else {
-            snackbar.enqueue({
-              message: `관리자 계정이 아닙니다. 다른 관리자에게 요청해 관리자 권한을 획득하세요. UID: ${user.uid}`,
-              severity: "warn",
-              persist: true,
-            });
+      const unsubscribeAuth = auth.current.onAuthStateChanged(async (user) => {
+        setUser(user);
+        if (user) {
+          try {
+            const value = await get(ref(db, `admin_emails/${user.uid}`));
+            const admin = value.exists();
+            if (admin) {
+              setIsAdmin(value.exists());
+            } else {
+              snackbar.enqueue({
+                message: `관리자 계정이 아닙니다. 다른 관리자에게 요청해 관리자 권한을 획득하세요. UID: ${user.uid}`,
+                severity: "warn",
+                persist: true,
+              });
+            }
+          } catch (error) {
+            setIsAdmin(false);
           }
-        } catch (error) {
+        } else {
           setIsAdmin(false);
         }
-      } else {
-        setIsAdmin(false);
-      }
-    });
+      });
+      return () => unsubscribeAuth();
+    },
+    [],
+    [snackbar]
+  );
 
+  useEffect(() => {
     const unsubscribeDb = onValue(
       ref(db, `admin_emails/${user?.uid ?? "null"}`),
       (snapshot) => {
@@ -92,17 +93,8 @@ export const AuthContextProvider = ({
         }
       }
     );
-
-    return () => {
-      unsubscribeAuth();
-      unsubscribeDb();
-    };
-  }, [snackbar, user?.uid]);
-
-  useEffect(() => {
-    const unsubscribe = addListeners();
-    return () => unsubscribe();
-  }, [addListeners]);
+    return () => unsubscribeDb();
+  }, [user?.uid]);
 
   const signIn = async () => {
     if (!auth.current || !provider.current) return;
