@@ -118,7 +118,7 @@ export default function Calculator() {
             )}
             onChange={({ value }: GameItem) => setGameId(value)}
             style={{
-              width: "18em",
+              width: "12em",
             }}
           />
           <Select
@@ -126,10 +126,10 @@ export default function Calculator() {
               .fill(undefined)
               .map((_, x) => ({ value: x + playersMin }))}
             value={playerCount}
-            render={({ value: x }: { value: number }) => `${x}인 게임`}
+            render={({ value: x }: { value: number }) => `${x}인`}
             onChange={({ value: x }: { value: number }) => setPlayerCount(x)}
             style={{
-              width: "8em",
+              width: "6em",
             }}
           />
           <Select
