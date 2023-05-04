@@ -2,6 +2,7 @@
   {
     "id": "terraforming-mars",
     "name": "테라포밍 마스",
+    "emoji": "🌍",
     "players": {
       "min": 1,
       "max": 5
@@ -14,6 +15,7 @@
   {
     "id": "sakura-arms",
     "name": "벚꽃 내리는 시대에 결투를",
+    "emoji": "🌸",
     "players": {
       "min": 2,
       "max": 2
@@ -26,6 +28,7 @@
   {
     "id": "halli-galli",
     "name": "할리갈리",
+    "emoji": "🍋",
     "players": {
       "min": 2,
       "max": 7
@@ -38,6 +41,7 @@
   {
     "id": "chess",
     "name": "체스",
+    "emoji": "♟",
     "players": {
       "min": 2,
       "max": 2
@@ -50,6 +54,7 @@
   {
     "id": "crazy-time",
     "name": "크레이지 타임",
+    "emoji": "🕰",
     "players": {
       "min": 3,
       "max": 14
@@ -62,6 +67,7 @@
   {
     "id": "dominion",
     "name": "도미니언",
+    "emoji": "🏰",
     "players": {
       "min": 2,
       "max": 4
@@ -74,6 +80,7 @@
   {
     "id": "splendor",
     "name": "스플렌더",
+    "emoji": "💎",
     "players": {
       "min": 2,
       "max": 4
@@ -86,6 +93,7 @@
   {
     "id": "yacht-dice",
     "name": "요트 다이스",
+    "emoji": "🎲",
     "players": {
       "min": 1,
       "max": 20
@@ -98,6 +106,7 @@
   {
     "id": "no-thanks",
     "name": "노 땡스!",
+    "emoji": "🙅‍♂️",
     "players": {
       "min": 3,
       "max": 7
@@ -110,6 +119,7 @@
   {
     "id": "uno",
     "name": "UNO",
+    "emoji": "🃏",
     "players": {
       "min": 2,
       "max": 10
@@ -122,6 +132,7 @@
   {
     "id": "bang",
     "name": "뱅!",
+    "emoji": "🔫",
     "players": {
       "min": 4,
       "max": 7
@@ -134,6 +145,7 @@
   {
     "id": "zenga",
     "name": "젠가",
+    "emoji": "📦",
     "players": {
       "min": 1,
       "max": 8
@@ -146,6 +158,7 @@
   {
     "id": "richii-mahjong",
     "name": "리치 마작",
+    "emoji": "\uD83C\uDC04",
     "players": {
       "min": 3,
       "max": 4
@@ -158,6 +171,7 @@
   {
     "id": "custom",
     "name": "직접 입력",
+    "emoji": "📝",
     "players": {
       "min": 1,
       "max": 20
