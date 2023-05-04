@@ -13,6 +13,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const TopContainer = styled.div`
+  position: sticky;
+  top: 0;
   display: flex;
 `;
 
