@@ -97,7 +97,7 @@ export const AuthContextProvider = ({
       unsubscribeAuth();
       unsubscribeDb();
     };
-  }, [user]);
+  }, [snackbar, user?.uid]);
 
   useEffect(() => {
     const unsubscribe = addListeners();
