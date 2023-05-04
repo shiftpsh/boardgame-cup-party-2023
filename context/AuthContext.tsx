@@ -94,8 +94,23 @@ export const AuthContextProvider = ({
     if (!auth.current) return;
     try {
       await auth.current.signOut();
+      snackbar.enqueue({
+        message: "로그아웃되었습니다.",
+        severity: "success",
+      });
     } catch (error) {
       console.log(error);
+      if (error instanceof FirebaseError) {
+        snackbar.enqueue({
+          message: `로그아웃에 실패했습니다: ${error.message}`,
+          severity: "error",
+        });
+      } else {
+        snackbar.enqueue({
+          message: `로그아웃에 실패했습니다.`,
+          severity: "error",
+        });
+      }
     }
   };
 

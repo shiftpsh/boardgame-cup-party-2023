@@ -5,7 +5,7 @@ import {
 } from "@/context/SnackbarContext";
 import { css, keyframes, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import { Button } from "@solved-ac/ui-react";
+import { Button, Centering } from "@solved-ac/ui-react";
 import {
   IconAlertTriangle,
   IconCircleCheck,
@@ -193,10 +193,18 @@ const SnackbarItemDisplay = React.forwardRef<HTMLDivElement, SnackbarItemProps>(
               style={{
                 width: 32,
                 height: 32,
+                padding: 0,
               }}
               onClick={props.dequeue}
             >
-              <IconX />
+              <Centering style={{ height: "100%" }}>
+                <IconX
+                  style={{
+                    width: 16,
+                    height: 16,
+                  }}
+                />
+              </Centering>
             </Button>
           </SnackbarIconContainer>
         </SnackbarItemContainer>
