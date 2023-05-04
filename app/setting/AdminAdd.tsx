@@ -81,8 +81,8 @@ const AdminAdd = ({ adminUIDs, users }: Props) => {
           <Table fullWidth>
             <TableHead>
               <Row>
-                <Cell width="40%">이름</Cell>
-                <Cell width="40%">UID</Cell>
+                <Cell width="60%">이름</Cell>
+                <Cell width="20%">UID</Cell>
                 <Cell width="20%">추가</Cell>
               </Row>
             </TableHead>
@@ -115,7 +115,7 @@ const AdminAdd = ({ adminUIDs, users }: Props) => {
                         verticalAlign: "middle",
                       }}
                     >
-                      {uid}
+                      <Typo small>{uid}</Typo>
                     </Cell>
                     <Cell>
                       <Button

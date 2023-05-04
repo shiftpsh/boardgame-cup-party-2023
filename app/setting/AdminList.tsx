@@ -59,8 +59,8 @@ const AdminList = ({ adminUIDs, users }: Props) => {
       <Table fullWidth>
         <TableHead>
           <Row>
-            <Cell width="40%">이름</Cell>
-            <Cell width="40%">UID</Cell>
+            <Cell width="60%">이름</Cell>
+            <Cell width="20%">UID</Cell>
             <Cell width="20%">삭제</Cell>
           </Row>
         </TableHead>
@@ -71,15 +71,7 @@ const AdminList = ({ adminUIDs, users }: Props) => {
               <Row key={uid}>
                 {!user ? (
                   <Cell colSpan={2}>
-                    <Typo
-                      description
-                      ellipsis
-                      style={{
-                        display: "block",
-                      }}
-                    >
-                      {uid}
-                    </Typo>
+                    <Typo description>{uid}</Typo>
                   </Cell>
                 ) : (
                   <>
@@ -113,7 +105,7 @@ const AdminList = ({ adminUIDs, users }: Props) => {
                         verticalAlign: "middle",
                       }}
                     >
-                      {uid}
+                      <Typo small>{uid}</Typo>
                     </Cell>
                   </>
                 )}
