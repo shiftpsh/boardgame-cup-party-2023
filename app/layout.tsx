@@ -12,8 +12,8 @@ export default function RootLayout({
 }) {
   return (
     <ThemeProvider theme={solvedThemes.light}>
-      <AuthContextProvider>
-        <SnackbarProvider>
+      <SnackbarProvider>
+        <AuthContextProvider>
           <html lang="ko">
             <head>
               <link
@@ -38,8 +38,8 @@ export default function RootLayout({
               {children}
             </body>
           </html>
-        </SnackbarProvider>
-      </AuthContextProvider>
+        </AuthContextProvider>
+      </SnackbarProvider>
     </ThemeProvider>
   );
 }
