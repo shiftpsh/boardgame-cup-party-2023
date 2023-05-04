@@ -1,0 +1,170 @@
+[
+  {
+    "id": "terraforming-mars",
+    "name": "테라포밍 마스",
+    "players": {
+      "min": 1,
+      "max": 5
+    },
+    "estimatedPlayTime": {
+      "min": 90,
+      "max": 120
+    }
+  },
+  {
+    "id": "sakura-arms",
+    "name": "벚꽃 내리는 시대에 결투를",
+    "players": {
+      "min": 2,
+      "max": 2
+    },
+    "estimatedPlayTime": {
+      "min": 10,
+      "max": 20
+    }
+  },
+  {
+    "id": "halli-galli",
+    "name": "할리갈리",
+    "players": {
+      "min": 2,
+      "max": 7
+    },
+    "estimatedPlayTime": {
+      "min": 5,
+      "max": 15
+    }
+  },
+  {
+    "id": "chess",
+    "name": "체스",
+    "players": {
+      "min": 2,
+      "max": 2
+    },
+    "estimatedPlayTime": {
+      "min": 30,
+      "max": 60
+    }
+  },
+  {
+    "id": "crazy-time",
+    "name": "크레이지 타임",
+    "players": {
+      "min": 3,
+      "max": 14
+    },
+    "estimatedPlayTime": {
+      "min": 20,
+      "max": 30
+    }
+  },
+  {
+    "id": "dominion",
+    "name": "도미니언",
+    "players": {
+      "min": 2,
+      "max": 4
+    },
+    "estimatedPlayTime": {
+      "min": 30,
+      "max": 40
+    }
+  },
+  {
+    "id": "splendor",
+    "name": "스플렌더",
+    "players": {
+      "min": 2,
+      "max": 4
+    },
+    "estimatedPlayTime": {
+      "min": 20,
+      "max": 30
+    }
+  },
+  {
+    "id": "yacht-dice",
+    "name": "요트 다이스",
+    "players": {
+      "min": 1,
+      "max": 20
+    },
+    "estimatedPlayTime": {
+      "min": 5,
+      "max": 20
+    }
+  },
+  {
+    "id": "no-thanks",
+    "name": "노 땡스!",
+    "players": {
+      "min": 3,
+      "max": 7
+    },
+    "estimatedPlayTime": {
+      "min": 20,
+      "max": 30
+    }
+  },
+  {
+    "id": "uno",
+    "name": "UNO",
+    "players": {
+      "min": 2,
+      "max": 10
+    },
+    "estimatedPlayTime": {
+      "min": 20,
+      "max": 30
+    }
+  },
+  {
+    "id": "bang",
+    "name": "뱅!",
+    "players": {
+      "min": 4,
+      "max": 7
+    },
+    "estimatedPlayTime": {
+      "min": 20,
+      "max": 40
+    }
+  },
+  {
+    "id": "zenga",
+    "name": "젠가",
+    "players": {
+      "min": 1,
+      "max": 8
+    },
+    "estimatedPlayTime": {
+      "min": 5,
+      "max": 20
+    }
+  },
+  {
+    "id": "richii-mahjong",
+    "name": "리치 마작",
+    "players": {
+      "min": 3,
+      "max": 4
+    },
+    "estimatedPlayTime": {
+      "min": 30,
+      "max": 60
+    }
+  },
+  {
+    "id": "custom",
+    "name": "직접 입력",
+    "players": {
+      "min": 1,
+      "max": 20
+    },
+    "estimatedPlayTime": {
+      "min": 5,
+      "max": 120
+    }
+  }
+]
