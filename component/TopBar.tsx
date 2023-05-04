@@ -38,16 +38,20 @@ const TopBar = () => {
               <IconLogout />
             </Typo>
           </Button>
-          <Button transparent>
-            <Typo>
-              <IconPlus />
-            </Typo>
-          </Button>
-          <Button transparent>
-            <Typo>
-              <IconSettings />
-            </Typo>
-          </Button>
+          {auth.isAdmin && (
+            <>
+              <Button transparent>
+                <Typo>
+                  <IconPlus />
+                </Typo>
+              </Button>
+              <Button transparent>
+                <Typo>
+                  <IconSettings />
+                </Typo>
+              </Button>
+            </>
+          )}
           <Space w={8} />
         </>
       ) : (
@@ -55,6 +59,7 @@ const TopBar = () => {
           <Button transparent onClick={() => auth.signIn()}>
             <Typo description>관리</Typo>
           </Button>
+          <Space w={8} />
         </>
       )}
     </TopContainer>

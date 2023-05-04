@@ -1,15 +1,15 @@
 "use client";
 
 import {
-    Cell,
-    Container,
-    Row,
-    Select,
-    Space,
-    Table,
-    TableBody,
-    TableHead,
-    Typo,
+  Cell,
+  Container,
+  Row,
+  Select,
+  Space,
+  Table,
+  TableBody,
+  TableHead,
+  Typo,
 } from "@solved-ac/ui-react";
 import { useReducer, useState } from "react";
 
@@ -97,8 +97,6 @@ export default function Calculator() {
 
   const playersMin = Math.max(2, Math.min(10, players.min));
   const playersMax = Math.max(2, Math.min(10, players.max));
-
-  console.log(playerCount, minutes, gameId);
 
   return (
     <>

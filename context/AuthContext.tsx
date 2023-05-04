@@ -1,4 +1,5 @@
 "use client";
+import { db } from "@/utils/database";
 import firebase from "@/utils/firebase";
 import { FirebaseError } from "firebase/app";
 import {
@@ -10,19 +11,27 @@ import {
     setPersistence,
     signInWithPopup,
 } from "firebase/auth";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { get, onValue, ref, set } from "firebase/database";
+import {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 import { useSnackbar } from "./SnackbarContext";
-
-const ALLOWED_EMAILS = ["me@shiftpsh.com"];
 
 interface AuthContextValues {
   user: User | null;
+  isAdmin: boolean;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValues>({
   user: null,
+  isAdmin: false,
   signIn: async () => {},
   signOut: async () => {},
 });
@@ -36,40 +45,71 @@ export const AuthContextProvider = ({
 }) => {
   const snackbar = useSnackbar();
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   const auth = useRef<Auth | null>(null);
   const provider = useRef<GoogleAuthProvider | null>(null);
 
-  const initialize = () => {
+  useEffect(() => {
     auth.current = getAuth(firebase);
     auth.current.languageCode = "ko";
     provider.current = new GoogleAuthProvider();
+  }, []);
 
-    const unsubscribe = auth.current.onAuthStateChanged((user) => {
+  const addListeners = useCallback(() => {
+    if (!auth.current) return () => {};
+
+    const unsubscribeAuth = auth.current.onAuthStateChanged(async (user) => {
       setUser(user);
+      if (user) {
+        try {
+          const value = await get(ref(db, `admin_emails/${user.uid}`));
+          setIsAdmin(value.exists());
+        } catch (error) {
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
+      }
     });
-    return () => unsubscribe();
-  };
+
+    const unsubscribeDb = onValue(
+      ref(db, `admin_emails/${user?.uid ?? "null"}`),
+      (snapshot) => {
+        if (snapshot.exists()) {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
+      }
+    );
+
+    return () => {
+      unsubscribeAuth();
+      unsubscribeDb();
+    };
+  }, [user]);
 
   useEffect(() => {
-    const unsubscribe = initialize();
+    const unsubscribe = addListeners();
     return () => unsubscribe();
-  }, []);
+  }, [addListeners]);
 
   const signIn = async () => {
     if (!auth.current || !provider.current) return;
     try {
       await setPersistence(auth.current, browserLocalPersistence);
+
       const result = await signInWithPopup(auth.current, provider.current);
       const user = result.user;
-      if (!ALLOWED_EMAILS.includes(user.email!)) {
-        snackbar.enqueue({
-          message: "허용되지 않은 이메일입니다.",
-          severity: "error",
-        });
-        await signOut();
-      }
       setUser(user);
+
+      await set(ref(db, `users/${user.uid}`), {
+        name: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+      });
+
       snackbar.enqueue({
         message: "로그인되었습니다.",
         severity: "success",
@@ -115,7 +155,7 @@ export const AuthContextProvider = ({
   };
 
   return (
-    <AuthContext.Provider value={{ user, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, isAdmin, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
