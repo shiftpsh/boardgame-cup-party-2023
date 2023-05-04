@@ -64,7 +64,16 @@ export const AuthContextProvider = ({
       if (user) {
         try {
           const value = await get(ref(db, `admin_emails/${user.uid}`));
-          setIsAdmin(value.exists());
+          const admin = value.exists();
+          if (admin) {
+            setIsAdmin(value.exists());
+          } else {
+            snackbar.enqueue({
+              message: `관리자 계정이 아닙니다. 다른 관리자에게 요청해 관리자 권한을 획득하세요. UID: ${user.uid}`,
+              severity: "warn",
+              persist: true,
+            });
+          }
         } catch (error) {
           setIsAdmin(false);
         }
