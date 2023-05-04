@@ -14,28 +14,12 @@ import {
 import { useReducer, useState } from "react";
 
 import GAMES from "@/app/games.json";
-import Emoji from "@/component/Emoji";
+import GameSelector from "@/component/GameSelector";
 import { rankColor } from "@/styles/colors";
 import { clampMinutes, clampPlayerCount } from "@/utils/math";
 import { score, scoreWeightByRank, totalScoreWeight } from "@/utils/score";
 import styled from "@emotion/styled";
 import { IconInfoCircle } from "@tabler/icons-react";
-
-interface GameItem {
-  label: string;
-  value: string;
-  emoji: string;
-}
-
-const SELECT_GAME_ITEMS = GAMES.map((game) => ({
-  label: game.name,
-  value: game.id,
-  emoji: game.emoji,
-})).sort((a, b) => {
-  if (a.value === "custom") return 1;
-  if (b.value === "custom") return -1;
-  return a.label.localeCompare(b.label);
-}) satisfies GameItem[];
 
 const SELECT_MINUTE_ITEMS = [
   5, 10, 15, 20, 25, 30, 40, 50, 60, 90, 120, 150, 180, 210, 240, 270, 300,
@@ -55,12 +39,6 @@ const ScoreValueCellContents = styled.div`
   justify-content: flex-end;
   text-align: right;
   gap: 0 16px;
-`;
-
-const EmojiWrapper = styled.span`
-  display: inline-block;
-  text-align: center;
-  width: 2em;
 `;
 
 export default function Calculator() {
@@ -103,18 +81,9 @@ export default function Calculator() {
       <Space h={64} />
       <Container>
         <SelectRow>
-          <Select
-            items={SELECT_GAME_ITEMS}
+          <GameSelector
             value={gameId}
-            render={({ label, emoji }: GameItem) => (
-              <span>
-                <EmojiWrapper>
-                  <Emoji emoji={emoji} />
-                </EmojiWrapper>
-                {label}
-              </span>
-            )}
-            onChange={({ value }: GameItem) => setGameId(value)}
+            onChange={setGameId}
             style={{
               width: "12em",
             }}

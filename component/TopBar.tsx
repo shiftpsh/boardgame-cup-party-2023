@@ -47,11 +47,13 @@ const TopBar = () => {
           </TopBarButton>
           {auth.isAdmin && (
             <>
-              <TopBarButton transparent>
-                <Typo>
-                  <IconPlus />
-                </Typo>
-              </TopBarButton>
+              <Link href="/add" passHref legacyBehavior>
+                <TopBarButton transparent>
+                  <Typo>
+                    <IconPlus />
+                  </Typo>
+                </TopBarButton>
+              </Link>
               <Link href="/setting" passHref legacyBehavior>
                 <TopBarButton transparent as="a">
                   <Typo>
