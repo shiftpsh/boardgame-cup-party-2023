@@ -11,6 +11,13 @@ const TopContainer = styled.div`
   display: flex;
 `;
 
+const TopBarButton = styled(Button)`
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 const TopBar = () => {
   const auth = useAuth();
   const pathname = usePathname();
@@ -33,23 +40,25 @@ const TopBar = () => {
 
       {auth.user ? (
         <>
-          <Button transparent onClick={() => auth.signOut()}>
+          <TopBarButton transparent onClick={() => auth.signOut()}>
             <Typo>
               <IconLogout />
             </Typo>
-          </Button>
+          </TopBarButton>
           {auth.isAdmin && (
             <>
-              <Button transparent>
+              <TopBarButton transparent>
                 <Typo>
                   <IconPlus />
                 </Typo>
-              </Button>
-              <Button transparent>
-                <Typo>
-                  <IconSettings />
-                </Typo>
-              </Button>
+              </TopBarButton>
+              <Link href="/setting" passHref legacyBehavior>
+                <TopBarButton transparent as="a">
+                  <Typo>
+                    <IconSettings />
+                  </Typo>
+                </TopBarButton>
+              </Link>
             </>
           )}
           <Space w={8} />
