@@ -1,7 +1,7 @@
 "use client";
 
 import GameSelector from "@/component/GameSelector";
-import { GameResultRank } from "@/types/GameResult";
+import { GameResult, GameResultRank } from "@/types/GameResult";
 import {
     Button,
     Cell,
@@ -20,6 +20,7 @@ import { useMemo, useRef, useState } from "react";
 import GAMES from "@/app/games.json";
 import USERS from "@/app/users.json";
 import { useAuth } from "@/context/AuthContext";
+import { useSnackbar } from "@/context/SnackbarContext";
 import { db } from "@/utils/database";
 import { clamp } from "@/utils/math";
 import { score } from "@/utils/score";
@@ -30,7 +31,15 @@ import {
     IconPlus,
     IconTrash,
 } from "@tabler/icons-react";
+import { FirebaseError } from "firebase/app";
 import { ref, set } from "firebase/database";
+import {
+    DragDropContext,
+    Draggable,
+    Droppable,
+    OnDragEndResponder,
+} from "react-beautiful-dnd";
+import { v4 as uuidv4 } from "uuid";
 
 const UserButtons = styled.div`
   display: flex;
@@ -38,8 +47,18 @@ const UserButtons = styled.div`
   gap: 8px;
 `;
 
+const DndTableBody = styled(TableBody)`
+  display: block;
+`;
+
+const DndRow = styled(Row)`
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 1fr;
+`;
+
 export default function Add() {
   const auth = useAuth();
+  const snackbar = useSnackbar();
 
   const [gameId, setGameId] = useState<string>("terraforming-mars");
   const [minutes, setMinutes] = useState<number>(120);
@@ -111,15 +130,52 @@ export default function Add() {
     );
   };
 
+  const handleDragUser: OnDragEndResponder = ({ destination, source }) => {
+    if (!destination) return;
+    if (destination.index === source.index) return;
+    setResult((prev) => {
+      const result = [...prev];
+      const [removed] = result.splice(source.index, 1);
+      result.splice(destination.index, 0, removed);
+      return result.map((x, i) => ({ ...x, rank: i + 1 }));
+    });
+  };
+
   const handleAddGameResult = async () => {
     if (adding) return;
     setAdding(true);
 
+    const gameUUID = uuidv4();
     const finishedAt = Date.now();
 
     try {
-      await set(ref(db, `games/${gameId}/results/${Date.now()}`), {});
-    } catch (e) {}
+      await set(ref(db, `games/${gameUUID}`), {
+        uuid: gameUUID,
+        finishedAt,
+        gameId,
+        durationMinutes: minutes,
+        result,
+      } satisfies GameResult);
+      snackbar.enqueue({
+        message: "게임 결과가 추가되었습니다.",
+        severity: "success",
+      });
+      setResult([]);
+    } catch (e) {
+      if (e instanceof FirebaseError) {
+        snackbar.enqueue({
+          message: `게임 결과 추가에 실패했습니다: ${e.message}`,
+          severity: "error",
+        });
+      } else {
+        snackbar.enqueue({
+          message: `게임 결과 추가에 실패했습니다.`,
+          severity: "error",
+        });
+      }
+    }
+
+    setAdding(false);
   };
 
   if (!auth.isAdmin) {
@@ -207,66 +263,87 @@ export default function Add() {
         </EmptyStatePlaceholder>
       ) : (
         <>
-          <Table
-            fullWidth
-            style={{
-              tableLayout: "fixed",
-            }}
-          >
+          <Table fullWidth>
             <TableHead>
-              <Row>
-                <Cell width="20%">순위</Cell>
-                <Cell width="40%">핸들</Cell>
-                <Cell width="20%">점수</Cell>
-                <Cell width="20%">삭제</Cell>
-              </Row>
+              <DndRow>
+                <Cell>순위</Cell>
+                <Cell>핸들</Cell>
+                <Cell>점수</Cell>
+                <Cell>삭제</Cell>
+              </DndRow>
             </TableHead>
-            <TableBody>
-              {result.map((user) => (
-                <Row key={user.handle}>
-                  <Cell
-                    style={{
-                      textAlign: "center",
-                    }}
+            <DragDropContext onDragEnd={handleDragUser}>
+              <Droppable droppableId="list">
+                {(provided, snapshot) => (
+                  <DndTableBody
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
                   >
-                    <Typo tabular>{user.rank}위</Typo>
-                  </Cell>
-                  <Cell
-                    style={{
-                      verticalAlign: "middle",
-                    }}
-                  >
-                    <Typo ellipsis description={user.exclude}>
-                      {user.handle}
-                    </Typo>
-                  </Cell>
-                  <Cell
-                    style={{
-                      textAlign: "right",
-                    }}
-                  >
-                    <Typo tabular>
-                      {user.exclude
-                        ? 0
-                        : score(
-                            result.length,
-                            minutes,
-                            user.rank
-                          ).toLocaleString("en-US")}
-                    </Typo>
-                  </Cell>
-                  <Cell padding="none">
-                    <Button
-                      onClick={() => handleRemoveUser(user.handle)}
-                      fullWidth
-                      transparent
-                    >
-                      <IconTrash />
-                    </Button>
-                  </Cell>
-                </Row>
-              ))}
-            </TableBody>
+                    {result.map((user) => (
+                      <Draggable
+                        draggableId={user.handle}
+                        key={user.handle}
+                        index={user.rank - 1}
+                      >
+                        {(provided, snapshot) => (
+                          <DndRow
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            style={{
+                              ...provided.draggableProps.style,
+                              ...provided.draggableProps.style,
+                            }}
+                          >
+                            <Cell
+                              style={{
+                                textAlign: "center",
+                              }}
+                            >
+                              <Typo tabular>{user.rank}위</Typo>
+                            </Cell>
+                            <Cell
+                              style={{
+                                verticalAlign: "middle",
+                              }}
+                            >
+                              <Typo ellipsis description={user.exclude}>
+                                {user.handle}
+                              </Typo>
+                            </Cell>
+                            <Cell
+                              style={{
+                                textAlign: "right",
+                              }}
+                            >
+                              <Typo tabular>
+                                {user.exclude
+                                  ? 0
+                                  : score(
+                                      result.length,
+                                      minutes,
+                                      user.rank
+                                    ).toLocaleString("en-US")}
+                              </Typo>
+                            </Cell>
+                            <Cell padding="none">
+                              <Button
+                                onClick={() => handleRemoveUser(user.handle)}
+                                fullWidth
+                                transparent
+                              >
+                                <IconTrash />
+                              </Button>
+                            </Cell>
+                          </DndRow>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </DndTableBody>
+                )}
+              </Droppable>
+            </DragDropContext>
           </Table>
           <Space h={32} />
           <Button

@@ -5,7 +5,9 @@ export interface GameResultRank {
 }
 
 export interface GameResult {
-  finishedAt: string;
+  uuid: string;
+  finishedAt: number;
   gameId: string;
+  durationMinutes: number;
   result: GameResultRank[];
 }
