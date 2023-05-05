@@ -174,7 +174,8 @@ export default function Calculator() {
                         &frasl;
                         {totalScoreWeight(playerCount).toLocaleString("en-US")}
                       </Typo>{" "}
-                      &times; {playerCount} &times; {minutes} &times; 10 =
+                      &times; <AnimatedNumber value={playerCount} /> &times;{" "}
+                      <AnimatedNumber value={minutes} /> &times; 10 =
                     </Typo>
                     <Typo tabular h2 no-margin as="span">
                       <AnimatedNumber
