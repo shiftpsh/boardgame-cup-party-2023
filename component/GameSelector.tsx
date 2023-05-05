@@ -1,6 +1,6 @@
 import GAMES from "@/app/games.json";
 import styled from "@emotion/styled";
-import { Select } from "@solved-ac/ui-react";
+import { Select, SelectProps } from "@solved-ac/ui-react";
 import { HTMLAttributes } from "react";
 import Emoji from "./Emoji";
 
@@ -26,9 +26,11 @@ const SELECT_GAME_ITEMS = GAMES.map((game) => ({
   return a.label.localeCompare(b.label);
 }) satisfies GameItem[];
 
-interface Props extends Omit<HTMLAttributes<HTMLDivElement>, "onChange"> {
+interface Props
+  extends SelectProps<GameItem>,
+    Omit<HTMLAttributes<HTMLDivElement>, "onChange"> {
   value: string;
-  onChange: (gameId: string) => void;
+  onChange: (gameId: GameItem) => void;
 }
 
 const GameSelector = ({ value, onChange, ...rest }: Props) => {
@@ -44,7 +46,7 @@ const GameSelector = ({ value, onChange, ...rest }: Props) => {
           {label}
         </span>
       )}
-      onChange={({ value }: GameItem) => onChange(value)}
+      onChange={(value: GameItem) => onChange(value)}
       {...rest}
     />
   );

@@ -9,6 +9,8 @@ const TopContainer = styled.div`
   position: sticky;
   top: 0;
   display: flex;
+  z-index: 1000;
+  background-color: ${({ theme }) => theme.color.background.page};
 `;
 
 const TopBarButton = styled(Button)`

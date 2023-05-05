@@ -83,7 +83,7 @@ export default function Calculator() {
         <SelectRow>
           <GameSelector
             value={gameId}
-            onChange={setGameId}
+            onChange={({ value }) => setGameId(value)}
             style={{
               width: "12em",
             }}
