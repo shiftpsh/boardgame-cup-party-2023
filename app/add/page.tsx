@@ -19,6 +19,7 @@ import { useMemo, useRef, useState } from "react";
 
 import GAMES from "@/app/games.json";
 import USERS from "@/app/users.json";
+import AnimatedNumber from "@/component/AnimatedNumber";
 import { useAuth } from "@/context/AuthContext";
 import { useSnackbar } from "@/context/SnackbarContext";
 import { db } from "@/utils/database";
@@ -317,13 +318,13 @@ export default function Add() {
                               }}
                             >
                               <Typo tabular>
-                                {user.exclude
-                                  ? 0
-                                  : score(
-                                      result.length,
-                                      minutes,
-                                      user.rank
-                                    ).toLocaleString("en-US")}
+                                <AnimatedNumber
+                                  value={
+                                    user.exclude
+                                      ? 0
+                                      : score(result.length, minutes, user.rank)
+                                  }
+                                />
                               </Typo>
                             </Cell>
                             <Cell padding="none">

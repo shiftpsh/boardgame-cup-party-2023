@@ -14,6 +14,7 @@ import {
 import { useReducer, useState } from "react";
 
 import GAMES from "@/app/games.json";
+import AnimatedNumber from "@/component/AnimatedNumber";
 import GameSelector from "@/component/GameSelector";
 import { rankColor } from "@/styles/colors";
 import { clampMinutes, clampPlayerCount } from "@/utils/math";
@@ -176,9 +177,9 @@ export default function Calculator() {
                       &times; {playerCount} &times; {minutes} &times; 10 =
                     </Typo>
                     <Typo tabular h2 no-margin as="span">
-                      {score(playerCount, minutes, x + 1).toLocaleString(
-                        "en-US"
-                      )}
+                      <AnimatedNumber
+                        value={score(playerCount, minutes, x + 1)}
+                      />
                     </Typo>
                   </ScoreValueCellContents>
                 </Cell>
