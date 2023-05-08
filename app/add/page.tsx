@@ -1,7 +1,7 @@
 "use client";
 
 import GameSelector from "@/component/GameSelector";
-import { GameResult, GameResultRank } from "@/types/GameResult";
+import { GameResultStarted } from "@/types/GameResult";
 import {
     Button,
     Cell,
@@ -11,35 +11,32 @@ import {
     Space,
     Table,
     TableBody,
+    TableContainer,
     TableHead,
     TextField,
     Typo,
 } from "@solved-ac/ui-react";
 import { useMemo, useRef, useState } from "react";
 
-import GAMES from "@/app/games.json";
 import USERS from "@/app/users.json";
-import AnimatedNumber from "@/component/AnimatedNumber";
+import ElapsedTime from "@/component/ElapsedTime";
+import Emoji from "@/component/Emoji";
 import { useAuth } from "@/context/AuthContext";
 import { useSnackbar } from "@/context/SnackbarContext";
+import useGames from "@/hooks/useGames";
 import { db } from "@/utils/database";
-import { clamp } from "@/utils/math";
-import { score } from "@/utils/score";
+import { gameById } from "@/utils/game";
 import styled from "@emotion/styled";
 import {
     IconAlertTriangle,
+    IconEdit,
     IconInfoCircle,
     IconPlus,
     IconTrash,
 } from "@tabler/icons-react";
 import { FirebaseError } from "firebase/app";
 import { ref, set } from "firebase/database";
-import {
-    DragDropContext,
-    Draggable,
-    Droppable,
-    OnDragEndResponder,
-} from "react-beautiful-dnd";
+import Link from "next/link";
 import { v4 as uuidv4 } from "uuid";
 
 const UserButtons = styled.div`
@@ -48,35 +45,34 @@ const UserButtons = styled.div`
   gap: 8px;
 `;
 
-const DndTableBody = styled(TableBody)`
-  display: block;
-`;
-
-const DndRow = styled(Row)`
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr 1fr;
-`;
-
 export default function Add() {
   const auth = useAuth();
   const snackbar = useSnackbar();
+  const games = useGames();
 
   const [gameId, setGameId] = useState<string>("terraforming-mars");
-  const [minutes, setMinutes] = useState<number>(120);
-  const [result, setResult] = useState<GameResultRank[]>([]);
+  const [players, setPlayers] = useState<string[]>([]);
   const [userSearchInput, setUserSearchInput] = useState<string>("");
   const [adding, setAdding] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const game = useMemo(() => {
-    return GAMES.find((x) => x.id === gameId)!;
-  }, [gameId]);
+  const ongoingGames: GameResultStarted[] = useMemo(() => {
+    return games
+      .filter((x) => !("finishedAt" in x))
+      .sort((a, b) => b.startedAt - a.startedAt);
+  }, [games]);
+
+  const game = gameById(gameId);
 
   const filteredUsers = useMemo(() => {
     const input = userSearchInput.trim().toLocaleLowerCase();
     if (!input.length) return [];
     return USERS.filter((user) => {
-      if (result.find((x) => x.handle === user.handle)) return false;
+      if (players.find((x) => x === user.handle)) return false;
+      const alreadyPlaying = ongoingGames.find((x) =>
+        x.players.includes(user.handle)
+      );
+      if (alreadyPlaying) return false;
       if (user.handle.toLocaleLowerCase().includes(input)) return true;
       return false;
     }).sort((a, b) => {
@@ -88,58 +84,62 @@ export default function Add() {
         return sa ? -1 : 1;
       }
     });
-  }, [result, userSearchInput]);
+  }, [ongoingGames, players, userSearchInput]);
 
   const warnings = useMemo(() => {
     const warns: string[] = [];
-    if (result.length < 2) {
-      warns.push(`플레이어 수(${result.length}명)가 2명 미만`);
+    if (players.length < 2) {
+      warns.push(`플레이어 수(${players.length}명)가 2명 미만`);
     }
-    if (result.length < game.players.min) {
+    if (players.length < game.players.min) {
       warns.push(
-        `플레이어 수(${result.length}명)가 ${game.name} 권장 최소 플레이어 수(${game.players.min}명)보다 적음`
+        `플레이어 수(${players.length}명)가 ${game.name} 권장 최소 플레이어 수(${game.players.min}명)보다 적음`
       );
     }
-    if (result.length > game.players.max) {
+    if (players.length > game.players.max) {
       warns.push(
-        `플레이어 수(${result.length}명)가 ${game.name} 권장 최대 플레이어 수(${game.players.max}명)보다 많음`
+        `플레이어 수(${players.length}명)가 ${game.name} 권장 최대 플레이어 수(${game.players.max}명)보다 많음`
       );
     }
+    if (ongoingGames.find((x) => x.gameId === gameId)) {
+      warns.push(`진행 중인 ${game.name} 게임이 있음`);
+    }
+    players.forEach((player) => {
+      const alreadyPlaying = ongoingGames.find((x) =>
+        x.players.includes(player)
+      );
+      if (alreadyPlaying) {
+        warns.push(
+          `${player}님이 이미 ${
+            gameById(alreadyPlaying.gameId).name
+          } 게임을 진행 중`
+        );
+      }
+    });
     return warns;
-  }, [game.name, game.players.max, game.players.min, result.length]);
+  }, [
+    game.name,
+    game.players.max,
+    game.players.min,
+    gameId,
+    ongoingGames,
+    players,
+  ]);
 
   const handleAddUser = (handle: string) => {
     if (!inputRef.current) return;
     const user = USERS.find((x) => x.handle === handle);
     if (!user) return;
-    setResult((prev) => {
-      if (prev.find((x) => x.handle === handle)) return prev;
-      return [
-        ...prev,
-        { handle, rank: prev.length + 1, exclude: user.type === "staff" },
-      ];
+    setPlayers((prev) => {
+      if (prev.find((x) => x === handle)) return prev;
+      return [...prev, handle];
     });
     setUserSearchInput("");
     inputRef.current.focus();
   };
 
   const handleRemoveUser = (handle: string) => {
-    setResult((prev) =>
-      prev
-        .filter((x) => x.handle !== handle)
-        .map((x, i) => ({ ...x, rank: i + 1 }))
-    );
-  };
-
-  const handleDragUser: OnDragEndResponder = ({ destination, source }) => {
-    if (!destination) return;
-    if (destination.index === source.index) return;
-    setResult((prev) => {
-      const result = [...prev];
-      const [removed] = result.splice(source.index, 1);
-      result.splice(destination.index, 0, removed);
-      return result.map((x, i) => ({ ...x, rank: i + 1 }));
-    });
+    setPlayers((prev) => prev.filter((x) => x !== handle));
   };
 
   const handleAddGameResult = async () => {
@@ -147,30 +147,28 @@ export default function Add() {
     setAdding(true);
 
     const gameUUID = uuidv4();
-    const finishedAt = Date.now();
 
     try {
       await set(ref(db, `games/${gameUUID}`), {
         uuid: gameUUID,
-        finishedAt,
+        startedAt: Date.now(),
         gameId,
-        durationMinutes: minutes,
-        result,
-      } satisfies GameResult);
+        players,
+      } satisfies GameResultStarted);
       snackbar.enqueue({
-        message: "게임 결과가 추가되었습니다.",
+        message: "게임이 추가되었습니다.",
         severity: "success",
       });
-      setResult([]);
+      setPlayers([]);
     } catch (e) {
       if (e instanceof FirebaseError) {
         snackbar.enqueue({
-          message: `게임 결과 추가에 실패했습니다: ${e.message}`,
+          message: `게임 추가에 실패했습니다: ${e.message}`,
           severity: "error",
         });
       } else {
         snackbar.enqueue({
-          message: `게임 결과 추가에 실패했습니다.`,
+          message: `게임 추가에 실패했습니다.`,
           severity: "error",
         });
       }
@@ -190,6 +188,84 @@ export default function Add() {
   return (
     <Container>
       <Space h={64} />
+      <Typo h2 as="h1">
+        진행 중인 게임
+      </Typo>
+      {ongoingGames.length === 0 ? (
+        <>
+          <EmptyStatePlaceholder>
+            진행 중인 게임이 없습니다.
+          </EmptyStatePlaceholder>
+        </>
+      ) : (
+        <>
+          <TableContainer>
+            <Table
+              fullWidth
+              style={{
+                tableLayout: "fixed",
+              }}
+              padding="dense"
+            >
+              <TableHead>
+                <Row>
+                  <Cell width="20%">게임</Cell>
+                  <Cell width="40%">플레이어</Cell>
+                  <Cell width="20%">시간</Cell>
+                  <Cell width="20%">수정</Cell>
+                </Row>
+              </TableHead>
+              <TableBody>
+                {ongoingGames.map((game) => (
+                  <Row key={game.uuid}>
+                    <Cell>
+                      <Typo
+                        ellipsis
+                        style={{
+                          verticalAlign: "middle",
+                        }}
+                      >
+                        <Emoji emoji={gameById(game.gameId).emoji} />{" "}
+                        {gameById(game.gameId).name}
+                      </Typo>
+                    </Cell>
+                    <Cell>
+                      <Typo
+                        ellipsis
+                        style={{
+                          verticalAlign: "middle",
+                        }}
+                      >
+                        {game.players.join(", ")}
+                      </Typo>
+                    </Cell>
+                    <Cell
+                      style={{
+                        textAlign: "center",
+                      }}
+                    >
+                      <Typo tabular>
+                        <ElapsedTime start={game.startedAt} />
+                      </Typo>
+                    </Cell>
+                    <Cell padding="none">
+                      <Link href={`/add/${game.uuid}`}>
+                        <Button fullWidth transparent>
+                          <IconEdit />
+                        </Button>
+                      </Link>
+                    </Cell>
+                  </Row>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
+      )}
+      <Space h={64} />
+      <Typo h2 as="h1">
+        새 게임 추가
+      </Typo>
       <Typo h4 as="h2">
         게임
       </Typo>
@@ -200,32 +276,14 @@ export default function Add() {
       />
       <Space h={8} />
       <Typo h4 as="h2">
-        플레이 시간 (분)
-      </Typo>
-      <TextField<"input">
-        placeholder="게임 시간"
-        value={minutes.toString()}
-        type="number"
-        onChange={({ target: { value } }) => {
-          const num = Number(value);
-          if (Number.isNaN(num)) {
-            setMinutes(0);
-          } else {
-            setMinutes(clamp(Math.floor(num), 0, 1000));
-          }
-        }}
-        fullWidth
-      />
-      <Space h={16} />
-      <Typo h4 as="h2">
-        게임 결과{" "}
+        플레이어
         <Typo
           description
           style={{
             fontWeight: "normal",
           }}
         >
-          <IconInfoCircle /> {result.length}명
+          <IconInfoCircle /> {players.length}명
         </Typo>
       </Typo>
       <TextField<"input">
@@ -258,93 +316,35 @@ export default function Add() {
         ))}
       </UserButtons>
       <Space h={16} />
-      {result.length === 0 ? (
+      {players.length === 0 ? (
         <EmptyStatePlaceholder>
-          게입 결과를 입력하지 않았습니다.
+          게임을 입력하지 않았습니다.
         </EmptyStatePlaceholder>
       ) : (
         <>
-          <Table fullWidth>
+          <Table fullWidth padding="dense">
             <TableHead>
-              <DndRow>
-                <Cell>순위</Cell>
+              <Row>
                 <Cell>핸들</Cell>
-                <Cell>점수</Cell>
                 <Cell>삭제</Cell>
-              </DndRow>
+              </Row>
             </TableHead>
-            <DragDropContext onDragEnd={handleDragUser}>
-              <Droppable droppableId="list">
-                {(provided, snapshot) => (
-                  <DndTableBody
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                  >
-                    {result.map((user) => (
-                      <Draggable
-                        draggableId={user.handle}
-                        key={user.handle}
-                        index={user.rank - 1}
-                      >
-                        {(provided, snapshot) => (
-                          <DndRow
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={{
-                              ...provided.draggableProps.style,
-                              ...provided.draggableProps.style,
-                            }}
-                          >
-                            <Cell
-                              style={{
-                                textAlign: "center",
-                              }}
-                            >
-                              <Typo tabular>{user.rank}위</Typo>
-                            </Cell>
-                            <Cell
-                              style={{
-                                verticalAlign: "middle",
-                              }}
-                            >
-                              <Typo ellipsis description={user.exclude}>
-                                {user.handle}
-                              </Typo>
-                            </Cell>
-                            <Cell
-                              style={{
-                                textAlign: "right",
-                              }}
-                            >
-                              <Typo tabular>
-                                <AnimatedNumber
-                                  value={
-                                    user.exclude
-                                      ? 0
-                                      : score(result.length, minutes, user.rank)
-                                  }
-                                />
-                              </Typo>
-                            </Cell>
-                            <Cell padding="none">
-                              <Button
-                                onClick={() => handleRemoveUser(user.handle)}
-                                fullWidth
-                                transparent
-                              >
-                                <IconTrash />
-                              </Button>
-                            </Cell>
-                          </DndRow>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </DndTableBody>
-                )}
-              </Droppable>
-            </DragDropContext>
+            <TableBody>
+              {players.map((handle) => (
+                <Row key={handle}>
+                  <Cell>{handle}</Cell>
+                  <Cell padding="none">
+                    <Button
+                      onClick={() => handleRemoveUser(handle)}
+                      fullWidth
+                      transparent
+                    >
+                      <IconTrash />
+                    </Button>
+                  </Cell>
+                </Row>
+              ))}
+            </TableBody>
           </Table>
           <Space h={32} />
           <Button
@@ -352,7 +352,7 @@ export default function Add() {
             disabled={adding || warnings.length !== 0}
             onClick={handleAddGameResult}
           >
-            <IconPlus /> 기록 ({game.name}, {minutes}분, {result.length}명)
+            <IconPlus /> 게임 시작 ({game.name}, {players.length}명)
           </Button>
           {warnings.length !== 0 && (
             <>

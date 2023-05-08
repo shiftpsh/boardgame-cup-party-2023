@@ -4,10 +4,17 @@ export interface GameResultRank {
   handle: string;
 }
 
-export interface GameResult {
+export interface GameResultStarted {
   uuid: string;
-  finishedAt: number;
+  startedAt: number;
   gameId: string;
+  players: string[];
+}
+
+export interface GameResultFinished extends GameResultStarted {
+  finishedAt: number;
   durationMinutes: number;
   result: GameResultRank[];
 }
+
+export type GameResult = GameResultStarted | GameResultFinished;
