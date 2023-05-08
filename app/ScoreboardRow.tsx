@@ -3,10 +3,11 @@ import OngoingIcon from "@/component/OngoingIcon";
 import { ScoreboardUser } from "@/hooks/useScoreboard";
 import styled from "@emotion/styled";
 import { Space, Typo } from "@solved-ac/ui-react";
+import { motion } from "framer-motion";
 import ScoreboardCell from "./ScoreboardCell";
 import ScoreboardCellOngoing from "./ScoreboardCellOngoing";
 
-const ScoreboardRowWrapper = styled.tr`
+const ScoreboardRowWrapper = styled(motion.tr)`
   white-space: nowrap;
   word-break: keep-all;
   height: 96px;
@@ -93,10 +94,12 @@ interface Props {
 const ScoreboardRow = ({ user }: Props) => {
   return (
     <>
-      <ScoreboardRowWrapper>
+      <ScoreboardRowWrapper layoutId={user.handle}>
         <ScoreboardHandle>
           <ScoreboardHandleWrapper>
-            <Rank>{user.rank}</Rank>
+            <Rank>
+              <AnimatedNumber value={user.rank} />
+            </Rank>
             <Space w={8} />
             <Typo ellipsis>
               <span>{user.handle}</span>

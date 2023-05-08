@@ -35,52 +35,53 @@ const useScoreboard = () => {
   const users: ScoreboardUser[] = useMemo(() => {
     const rankMap = new Map<number, number>();
 
-    return USERS.map(({ handle, type, solves }) => {
-      const userGames = games
-        .filter((game) => game.players.includes(handle))
-        .sort((a, b) => a.startedAt - b.startedAt);
-      const ongoing = userGames.filter(
-        (game) => "finishedAt" in game === false
-      );
-      const finished: GameResultFinished[] = userGames.filter(
-        (game) => "finishedAt" in game
-      ) as GameResultFinished[];
+    return USERS.filter((u) => u.type !== "staff")
+      .map(({ handle, type, solves }) => {
+        const userGames = games
+          .filter((game) => game.players.includes(handle))
+          .sort((a, b) => a.startedAt - b.startedAt);
+        const ongoing = userGames.filter(
+          (game) => "finishedAt" in game === false
+        );
+        const finished: GameResultFinished[] = userGames.filter(
+          (game) => "finishedAt" in game
+        ) as GameResultFinished[];
 
-      const scoreEntries: (
-        | ScoreboardGameScoreEntry
-        | ScoreboardSolveScoreEntry
-      )[] = [
-        {
-          type: "solves",
-          score: solves * 10,
-          solves,
-        },
-        ...finished.map((game) => {
-          const player = game.result.find((x) => x.handle === handle)!;
-          return {
-            type: "game",
-            score: player.exclude
-              ? 0
-              : score(game.result.length, game.durationMinutes, player.rank),
-            game,
-            result: player,
-          } as const;
-        }),
-      ];
+        const scoreEntries: (
+          | ScoreboardGameScoreEntry
+          | ScoreboardSolveScoreEntry
+        )[] = [
+          {
+            type: "solves",
+            score: solves * 10,
+            solves,
+          },
+          ...finished.map((game) => {
+            const player = game.result.find((x) => x.handle === handle)!;
+            return {
+              type: "game",
+              score: player.exclude
+                ? 0
+                : score(game.result.length, game.durationMinutes, player.rank),
+              game,
+              result: player,
+            } as const;
+          }),
+        ];
 
-      const scoreTotal = scoreEntries.reduce(
-        (acc, { score }) => acc + score,
-        0
-      );
+        const scoreTotal = scoreEntries.reduce(
+          (acc, { score }) => acc + score,
+          0
+        );
 
-      return {
-        handle,
-        score: scoreTotal,
-        scoreEntries,
-        ongoingGames: ongoing,
-        rank: 0,
-      };
-    })
+        return {
+          handle,
+          score: scoreTotal,
+          scoreEntries,
+          ongoingGames: ongoing,
+          rank: 0,
+        };
+      })
       .sort((a, b) => b.score - a.score)
       .map((user, index) => {
         const rank = rankMap.get(user.score) ?? index + 1;

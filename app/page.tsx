@@ -2,6 +2,7 @@
 
 import useScoreboard from "@/hooks/useScoreboard";
 import { Divider } from "@solved-ac/ui-react";
+import { motion } from "framer-motion";
 import React from "react";
 import ScoreboardRow from "./ScoreboardRow";
 
@@ -21,7 +22,7 @@ export default function Home() {
             width: "100%",
           }}
         >
-          <tbody>
+          <motion.tbody layout>
             {scoreboard.map((row) => (
               <React.Fragment key={row.handle}>
                 <ScoreboardRow user={row} />
@@ -32,7 +33,7 @@ export default function Home() {
                 </tr>
               </React.Fragment>
             ))}
-          </tbody>
+          </motion.tbody>
         </table>
       </div>
     </>
