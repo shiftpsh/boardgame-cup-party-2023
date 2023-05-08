@@ -11,6 +11,7 @@ const ScoreboardRowWrapper = styled(motion.tr)`
   white-space: nowrap;
   word-break: keep-all;
   height: 96px;
+  direction: ltr;
   @media (min-width: 768px) {
     height: 72px;
   }
@@ -63,6 +64,7 @@ const ScoreboardContentsWide = styled.td`
 `;
 
 const ScoreboardContentsNarrow = styled.tr`
+  direction: ltr;
   vertical-align: middle;
   @media (min-width: 768px) {
     display: none;
@@ -95,30 +97,6 @@ const ScoreboardRow = ({ user }: Props) => {
   return (
     <>
       <ScoreboardRowWrapper layoutId={user.handle}>
-        <ScoreboardHandle>
-          <ScoreboardHandleWrapper>
-            <Rank>
-              <AnimatedNumber value={user.rank} />
-            </Rank>
-            <Space w={8} />
-            <Typo ellipsis>
-              <span>{user.handle}</span>
-            </Typo>
-          </ScoreboardHandleWrapper>
-        </ScoreboardHandle>
-        <ScoreboardContentsWide>
-          <ScoreboardContentsWrapper>
-            {user.scoreEntries.map((entry) => (
-              <ScoreboardCell
-                data={entry}
-                key={entry.type === "solves" ? "solves" : entry.game.uuid}
-              />
-            ))}
-            {user.ongoingGames.map((game) => (
-              <ScoreboardCellOngoing key={game.gameId} data={game} />
-            ))}
-          </ScoreboardContentsWrapper>
-        </ScoreboardContentsWide>
         <ScoreboardScore>
           <ScoreboardScoreWrapper>
             {user.ongoingGames.length !== 0 && (
@@ -134,12 +112,37 @@ const ScoreboardRow = ({ user }: Props) => {
             </Typo>
           </ScoreboardScoreWrapper>
         </ScoreboardScore>
+        <ScoreboardContentsWide>
+          <ScoreboardContentsWrapper>
+            {user.scoreEntries.map((entry) => (
+              <ScoreboardCell
+                data={entry}
+                key={entry.type === "solves" ? "solves" : entry.game.uuid}
+              />
+            ))}
+            {user.ongoingGames.map((game) => (
+              <ScoreboardCellOngoing key={game.gameId} data={game} />
+            ))}
+          </ScoreboardContentsWrapper>
+        </ScoreboardContentsWide>
+        <ScoreboardHandle>
+          <ScoreboardHandleWrapper>
+            <Rank>
+              <AnimatedNumber value={user.rank} />
+            </Rank>
+            <Space w={8} />
+            <Typo ellipsis>
+              <span>{user.handle}</span>
+            </Typo>
+          </ScoreboardHandleWrapper>
+        </ScoreboardHandle>
       </ScoreboardRowWrapper>
       <ScoreboardContentsNarrow>
         <td
           colSpan={2}
           style={{
             paddingBottom: 16,
+            paddingRight: 16,
           }}
         >
           <ScoreboardContentsWrapper>

@@ -15,6 +15,7 @@ export default function Home() {
         style={{
           position: "relative",
           overflowX: "auto",
+          direction: "rtl",
         }}
       >
         <table
