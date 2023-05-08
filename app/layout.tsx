@@ -2,8 +2,9 @@
 import TopBar from "@/component/TopBar";
 import { AuthContextProvider } from "@/context/AuthContext";
 import { SnackbarProvider } from "@/context/SnackbarContext";
+import { theme } from "@/styles/theme";
 import { Global, ThemeProvider } from "@emotion/react";
-import { SolvedGlobalStyles, solvedThemes } from "@solved-ac/ui-react";
+import { SolvedGlobalStyles } from "@solved-ac/ui-react";
 
 export default function RootLayout({
   children,
@@ -11,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ThemeProvider theme={solvedThemes.light}>
+    <ThemeProvider theme={theme}>
       <SnackbarProvider>
         <AuthContextProvider>
           <html lang="ko">

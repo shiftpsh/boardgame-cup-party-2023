@@ -11,7 +11,6 @@ import {
   Table,
   TableBody,
   TableHead,
-  TextField,
   Typo,
 } from "@solved-ac/ui-react";
 import { useEffect, useMemo, useState } from "react";
@@ -21,10 +20,10 @@ import AnimatedNumber from "@/component/AnimatedNumber";
 import Emoji from "@/component/Emoji";
 import { useAuth } from "@/context/AuthContext";
 import { useSnackbar } from "@/context/SnackbarContext";
+import useElapsedTime from "@/hooks/useElapsedTime";
 import useGames from "@/hooks/useGames";
 import { db } from "@/utils/database";
 import { gameById } from "@/utils/game";
-import { clamp } from "@/utils/math";
 import { score } from "@/utils/score";
 import styled from "@emotion/styled";
 import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
@@ -37,12 +36,6 @@ import {
   Droppable,
   OnDragEndResponder,
 } from "react-beautiful-dnd";
-
-const UserButtons = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-`;
 
 const DndTableBody = styled(TableBody)`
   display: block;
@@ -60,7 +53,6 @@ export default function Add() {
 
   const { uuid } = useParams();
 
-  const [minutes, setMinutes] = useState<number>(120);
   const [result, setResult] = useState<GameResultRank[]>([]);
   const [adding, setAdding] = useState<boolean>(false);
 
@@ -69,6 +61,13 @@ export default function Add() {
   }, [games, uuid]);
 
   const game = gameById(record?.gameId || "custom");
+  const elapsed = useElapsedTime(record?.startedAt || Date.now());
+  const realElapsed =
+    record && "finishedAt" in record
+      ? record.finishedAt - record.startedAt
+      : elapsed;
+  const elapsedMinutes = Math.floor(realElapsed / 1000 / 60);
+  const elapsedSeconds = Math.floor(realElapsed / 1000) % 60;
 
   const handleRemoveUser = (handle: string) => {
     setResult((prev) =>
@@ -93,11 +92,13 @@ export default function Add() {
     if (adding || !record) return;
     setAdding(true);
 
+    const now = Date.now();
+
     try {
-      await set(ref(db, `games/${record?.uuid}`), {
+      await set(ref(db, `games/${record.uuid}`), {
         ...record,
-        finishedAt: Date.now(),
-        durationMinutes: minutes,
+        finishedAt: now,
+        durationMinutes: elapsedMinutes,
         result,
       } satisfies GameResultFinished);
       snackbar.enqueue({
@@ -151,6 +152,14 @@ export default function Add() {
     );
   }
 
+  if (!record) {
+    return (
+      <Container>
+        <EmptyStatePlaceholder>게임을 찾을 수 없습니다.</EmptyStatePlaceholder>
+      </Container>
+    );
+  }
+
   return (
     <Container>
       <Space h={64} />
@@ -162,22 +171,9 @@ export default function Add() {
       </span>
       <Space h={16} />
       <Typo h4 as="h2">
-        플레이 시간 (분)
+        플레이 시간
       </Typo>
-      <TextField<"input">
-        placeholder="게임 시간"
-        value={minutes.toString()}
-        type="number"
-        onChange={({ target: { value } }) => {
-          const num = Number(value);
-          if (Number.isNaN(num)) {
-            setMinutes(0);
-          } else {
-            setMinutes(clamp(Math.floor(num), 0, 1000));
-          }
-        }}
-        fullWidth
-      />
+      {elapsedMinutes}분 {elapsedSeconds}초
       <Space h={16} />
       <Typo h4 as="h2">
         게임 결과{" "}
@@ -269,7 +265,11 @@ export default function Add() {
                                   value={
                                     user.exclude
                                       ? 0
-                                      : score(result.length, minutes, user.rank)
+                                      : score(
+                                          result.length,
+                                          elapsedMinutes,
+                                          user.rank
+                                        )
                                   }
                                 />
                               </Typo>
@@ -295,7 +295,8 @@ export default function Add() {
           </Table>
           <Space h={32} />
           <Button fullWidth disabled={adding} onClick={handleAddGameResult}>
-            <IconPlus /> 기록 ({game.name}, {minutes}분, {result.length}명)
+            <IconPlus /> 기록 ({game.name}, {elapsedMinutes}분, {result.length}
+            명)
           </Button>
         </>
       )}
