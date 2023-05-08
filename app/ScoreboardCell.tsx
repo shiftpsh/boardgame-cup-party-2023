@@ -6,7 +6,7 @@ import {
 } from "@/hooks/useScoreboard";
 import { gameById } from "@/utils/game";
 import styled from "@emotion/styled";
-import { Typo } from "@solved-ac/ui-react";
+import { Tooltip, Typo } from "@solved-ac/ui-react";
 
 const ScoreboardCellWrapper = styled.div`
   text-align: right;
@@ -35,10 +35,18 @@ const ScoreboardCell = ({ data }: Props) => {
       </Typo>
       <Typo description>
         {data.type === "solves" ? (
-          <>{data.solves}솔브</>
+          <>
+            ={data.solves}{" "}
+            <Tooltip title="보드게임컵 솔브 수">
+              <Emoji emoji="🏆" />
+            </Tooltip>
+          </>
         ) : (
           <>
-            #{data.result.rank} {<Emoji emoji={game.emoji} />}
+            #{data.result.rank}{" "}
+            <Tooltip title={game.name}>
+              <Emoji emoji={game.emoji} />
+            </Tooltip>
           </>
         )}
       </Typo>
