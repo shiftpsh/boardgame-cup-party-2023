@@ -133,6 +133,7 @@ const ScoreboardRow = ({ user }: Props) => {
             <Space w={8} />
             <Typo ellipsis>
               <span>{user.handle}</span>
+              {user.exclude && <Typo description> (스탭)</Typo>}
             </Typo>
           </ScoreboardHandleWrapper>
         </ScoreboardHandle>
