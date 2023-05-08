@@ -1,8 +1,10 @@
 import AnimatedNumber from "@/component/AnimatedNumber";
+import OngoingIcon from "@/component/OngoingIcon";
 import { ScoreboardUser } from "@/hooks/useScoreboard";
 import styled from "@emotion/styled";
 import { Space, Typo } from "@solved-ac/ui-react";
 import ScoreboardCell from "./ScoreboardCell";
+import ScoreboardCellOngoing from "./ScoreboardCellOngoing";
 
 const ScoreboardRowWrapper = styled.tr`
   white-space: nowrap;
@@ -44,6 +46,12 @@ const ScoreboardScore = styled.td`
     ${({ theme }) => theme.color.background.page} 80%,
     transparent
   );
+`;
+
+const ScoreboardScoreWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 `;
 
 const ScoreboardContentsWide = styled.td`
@@ -103,12 +111,25 @@ const ScoreboardRow = ({ user }: Props) => {
                 key={entry.type === "solves" ? "solves" : entry.game.uuid}
               />
             ))}
+            {user.ongoingGames.map((game) => (
+              <ScoreboardCellOngoing key={game.gameId} data={game} />
+            ))}
           </ScoreboardContentsWrapper>
         </ScoreboardContentsWide>
         <ScoreboardScore>
-          <Typo h2 no-margin tabular as="span">
-            <AnimatedNumber value={user.score} />
-          </Typo>
+          <ScoreboardScoreWrapper>
+            {user.ongoingGames.length !== 0 && (
+              <>
+                <Typo description>
+                  <OngoingIcon />
+                </Typo>
+                <Space w={8} />
+              </>
+            )}
+            <Typo h2 no-margin tabular as="span">
+              <AnimatedNumber value={user.score} />
+            </Typo>
+          </ScoreboardScoreWrapper>
         </ScoreboardScore>
       </ScoreboardRowWrapper>
       <ScoreboardContentsNarrow>
@@ -124,6 +145,9 @@ const ScoreboardRow = ({ user }: Props) => {
                 data={entry}
                 key={entry.type === "solves" ? "solves" : entry.game.uuid}
               />
+            ))}
+            {user.ongoingGames.map((game) => (
+              <ScoreboardCellOngoing key={game.gameId} data={game} />
             ))}
           </ScoreboardContentsWrapper>
         </td>
