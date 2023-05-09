@@ -46,7 +46,7 @@ export default function Home() {
           </>
         )}
         <Space h={8} />
-        {120 >= secondsUntilFreeze && secondsUntilFreeze > 60 && (
+        {60 * 60 >= secondsUntilFreeze && secondsUntilFreeze > 60 && (
           <>
             <Typo description tabular>
               {Math.floor(secondsUntilFreeze / 60)}분 후 프리즈
