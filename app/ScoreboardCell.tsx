@@ -8,6 +8,7 @@ import { gameById } from "@/utils/game";
 import styled from "@emotion/styled";
 import { Tooltip, Typo } from "@solved-ac/ui-react";
 import { IconQuestionMark } from "@tabler/icons-react";
+import { useEffect, useRef } from "react";
 
 const ScoreboardCellWrapper = styled.div`
   text-align: right;
@@ -24,8 +25,21 @@ const ScoreboardCell = ({ data, current }: Props) => {
   const elapsedTime =
     data.type === "solves" ? 0 : data.game.finishedAt - data.game.startedAt;
 
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (current && ref.current) {
+      ref.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "start",
+      });
+    }
+  }, [current]);
+
   return (
     <ScoreboardCellWrapper
+      ref={ref}
       style={{
         ...(data.frozen
           ? {
