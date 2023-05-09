@@ -3,6 +3,7 @@ import OngoingIcon from "@/component/OngoingIcon";
 import { ScoreboardUser } from "@/hooks/useScoreboard";
 import styled from "@emotion/styled";
 import { Space, Typo } from "@solved-ac/ui-react";
+import { IconQuestionMark } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import ScoreboardCell from "./ScoreboardCell";
 import ScoreboardCellOngoing from "./ScoreboardCellOngoing";
@@ -107,6 +108,14 @@ const ScoreboardRow = ({ user }: Props) => {
                 <Space w={8} />
               </>
             )}
+            {user.scoreEntries.find((x) => x.score === null) ? (
+              <>
+                <Typo description>
+                  <IconQuestionMark />
+                </Typo>
+                <Space w={8} />
+              </>
+            ) : null}
             <Typo h2 no-margin tabular as="span">
               <AnimatedNumber value={user.score} />
             </Typo>

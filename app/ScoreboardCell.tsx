@@ -7,6 +7,7 @@ import {
 import { gameById } from "@/utils/game";
 import styled from "@emotion/styled";
 import { Tooltip, Typo } from "@solved-ac/ui-react";
+import { IconQuestionMark } from "@tabler/icons-react";
 
 const ScoreboardCellWrapper = styled.div`
   text-align: right;
@@ -44,7 +45,9 @@ const ScoreboardCell = ({ data }: Props) => {
         {data.score !== null ? (
           <AnimatedNumber value={data.score} />
         ) : (
-          <Typo description>?</Typo>
+          <Typo description>
+            <IconQuestionMark />
+          </Typo>
         )}
       </Typo>
       <Typo description>
