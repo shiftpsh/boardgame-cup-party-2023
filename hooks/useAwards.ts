@@ -5,17 +5,46 @@ const useAwards = () => {
   const { scoreboard } = useGames();
 
   const rankers = useMemo(() => {
-    const ret = scoreboard.filter((x) => !x.exclude).slice(0, 3);
-    scoreboard
-      .filter((x) => !x.exclude)
-      .slice(3)
-      .forEach((x) => {
-        if (x.rank === ret[2].rank) {
-          ret.push(x);
+    const rankMap = new Map<string, number>();
+    const ret = scoreboard
+      .map((x) => ({
+        handle: x.handle,
+        score: x.scoreEntries.reduce((a, b) => a + b.score, 0),
+        lastScoreUpdateTime: x.lastScoreUpdateTime,
+        user: x,
+      }))
+      .filter((x) => !x.user.exclude)
+      .sort((a, b) =>
+        a.score === b.score
+          ? a.lastScoreUpdateTime - b.lastScoreUpdateTime
+          : b.score - a.score
+      )
+      .map((x, i) => {
+        const key = `${x.score}-${x.lastScoreUpdateTime}`;
+        if (rankMap.has(key)) {
+          return {
+            ...x,
+            rank: rankMap.get(key)!,
+          };
         }
+        const ret = {
+          ...x,
+          rank: i + 1,
+        };
+        rankMap.set(key, i + 1);
+        return ret;
       });
+
     return ret;
   }, [scoreboard]);
+
+  const rankMap = useMemo(() => {
+    const ret = new Map<string, number>();
+    rankers.forEach((x) => {
+      ret.set(x.handle, x.rank);
+    });
+    return ret;
+  }, [rankers]);
 
   const most1st = useMemo(() => {
     const ret = scoreboard
@@ -25,12 +54,14 @@ const useAwards = () => {
           .length,
         user: x,
       }))
-      .filter(
-        (x) => !rankers.find((y) => y.handle === x.handle) && !x.user.exclude
-      )
-      .sort((a, b) => b.count - a.count);
+      .filter((x) => !x.user.exclude)
+      .sort((a, b) =>
+        a.count === b.count
+          ? rankMap.get(a.handle)! - rankMap.get(b.handle)!
+          : b.count - a.count
+      );
     return ret;
-  }, [rankers, scoreboard]);
+  }, [rankMap, scoreboard]);
 
   const mostLast = useMemo(() => {
     const ret = scoreboard
@@ -41,12 +72,14 @@ const useAwards = () => {
         ).length,
         user: x,
       }))
-      .filter(
-        (x) => !rankers.find((y) => y.handle === x.handle) && !x.user.exclude
-      )
-      .sort((a, b) => b.count - a.count);
+      .filter((x) => !x.user.exclude)
+      .sort((a, b) =>
+        a.count === b.count
+          ? rankMap.get(a.handle)! - rankMap.get(b.handle)!
+          : b.count - a.count
+      );
     return ret;
-  }, [rankers, scoreboard]);
+  }, [rankMap, scoreboard]);
 
   const longest = useMemo(() => {
     const ret = scoreboard
@@ -57,12 +90,14 @@ const useAwards = () => {
           .reduce((a, b) => Math.max(a, b), 0),
         user: x,
       }))
-      .filter(
-        (x) => !rankers.find((y) => y.handle === x.handle) && !x.user.exclude
-      )
-      .sort((a, b) => b.minutes - a.minutes);
+      .filter((x) => !x.user.exclude)
+      .sort((a, b) =>
+        a.minutes === b.minutes
+          ? rankMap.get(a.handle)! - rankMap.get(b.handle)!
+          : b.minutes - a.minutes
+      );
     return ret;
-  }, [rankers, scoreboard]);
+  }, [rankMap, scoreboard]);
 
   const matched = useMemo(() => {
     const ret = scoreboard
@@ -75,12 +110,14 @@ const useAwards = () => {
         ).size,
         user: x,
       }))
-      .filter(
-        (x) => !rankers.find((y) => y.handle === x.handle) && !x.user.exclude
-      )
-      .sort((a, b) => b.people - a.people);
+      .filter((x) => !x.user.exclude)
+      .sort((a, b) =>
+        a.people === b.people
+          ? rankMap.get(a.handle)! - rankMap.get(b.handle)!
+          : b.people - a.people
+      );
     return ret;
-  }, [rankers, scoreboard]);
+  }, [rankMap, scoreboard]);
 
   return {
     rankers,

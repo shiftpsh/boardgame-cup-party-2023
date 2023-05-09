@@ -1,7 +1,6 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { useGames } from "@/context/GamesContext";
 import { UserResponse } from "@/types/UserResponse";
 import { db } from "@/utils/database";
 import {
@@ -9,7 +8,6 @@ import {
   Container,
   EmptyStatePlaceholder,
   Space,
-  TextField,
   Typo,
 } from "@solved-ac/ui-react";
 import { IconInfoCircle } from "@tabler/icons-react";
@@ -18,13 +16,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import AdminAdd from "./AdminAdd";
 import AdminList from "./AdminList";
+import Awards from "./Awards";
+import EditFreeze from "./EditFreeze";
 
 export default function Setting() {
   const auth = useAuth();
-
-  const { freezeAt, setFreezeAt } = useGames();
-  const timezoneOffset = new Date().getTimezoneOffset() * 60000;
-  const freezeAtKst = new Date(freezeAt - timezoneOffset).toISOString();
 
   const [adminEmails, setAdminEmails] = useState<string[]>([]);
   const [users, setUsers] = useState<Map<string, UserResponse>>(new Map());
@@ -56,18 +52,6 @@ export default function Setting() {
     return unsubscribe;
   }, []);
 
-  const handleFreezeDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const date = e.target.value;
-    const time = freezeAtKst.split("T")[1].slice(0, 5);
-    setFreezeAt(new Date(`${date}T${time}+09:00`).getTime());
-  };
-
-  const handleFreezeTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const date = freezeAtKst.split("T")[0];
-    const time = e.target.value;
-    setFreezeAt(new Date(`${date}T${time}+09:00`).getTime());
-  };
-
   if (!auth.isAdmin) {
     return (
       <Container>
@@ -81,25 +65,7 @@ export default function Setting() {
       <Container>
         <Space h={32} />
         <Typo h2>프리즈</Typo>
-        <div
-          style={{
-            display: "flex",
-            gap: "0 8px",
-          }}
-        >
-          <TextField<"input">
-            type="date"
-            value={freezeAtKst.split("T")[0]}
-            onChange={handleFreezeDateChange}
-            fullWidth
-          />
-          <TextField<"input">
-            type="time"
-            value={freezeAtKst.split("T")[1].slice(0, 5)}
-            onChange={handleFreezeTimeChange}
-            fullWidth
-          />
-        </div>
+        <EditFreeze />
         <Space h={32} />
         <Typo h2>어워드 모드</Typo>
         <Space h={8} />
@@ -116,6 +82,9 @@ export default function Setting() {
         <Space h={32} />
         <Typo h2>새 관리자 추가</Typo>
         <AdminAdd adminUIDs={adminEmails} users={users} />
+        <Space h={32} />
+        <Typo h2>현재 시점 상 목록</Typo>
+        <Awards />
         <Space h={32} />
       </Container>
     </>
