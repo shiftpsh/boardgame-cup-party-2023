@@ -30,6 +30,7 @@ import styled from "@emotion/styled";
 import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
 import { FirebaseError } from "firebase/app";
 import { ref, set } from "firebase/database";
+import { useSearchParams } from "next/navigation";
 import {
   DragDropContext,
   Draggable,
@@ -51,7 +52,8 @@ const Page = (props: PageProps) => {
   const snackbar = useSnackbar();
   const games = useGames();
 
-  const { uuid } = props.searchParams || {};
+  const searchParams = useSearchParams();
+  const uuid = searchParams.get("uuid") || "";
 
   const [result, setResult] = useState<GameResultRank[]>([]);
   const [adding, setAdding] = useState<boolean>(false);
