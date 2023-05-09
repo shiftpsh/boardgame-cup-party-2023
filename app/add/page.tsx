@@ -3,18 +3,18 @@
 import GameSelector from "@/component/GameSelector";
 import { GameResultStarted } from "@/types/GameResult";
 import {
-    Button,
-    Cell,
-    Container,
-    EmptyStatePlaceholder,
-    Row,
-    Space,
-    Table,
-    TableBody,
-    TableContainer,
-    TableHead,
-    TextField,
-    Typo,
+  Button,
+  Cell,
+  Container,
+  EmptyStatePlaceholder,
+  Row,
+  Space,
+  Table,
+  TableBody,
+  TableContainer,
+  TableHead,
+  TextField,
+  Typo,
 } from "@solved-ac/ui-react";
 import { useMemo, useRef, useState } from "react";
 
@@ -28,11 +28,11 @@ import { db } from "@/utils/database";
 import { gameById } from "@/utils/game";
 import styled from "@emotion/styled";
 import {
-    IconAlertTriangle,
-    IconEdit,
-    IconInfoCircle,
-    IconPlus,
-    IconTrash,
+  IconAlertTriangle,
+  IconEdit,
+  IconInfoCircle,
+  IconPlus,
+  IconTrash,
 } from "@tabler/icons-react";
 import { FirebaseError } from "firebase/app";
 import { ref, set } from "firebase/database";
@@ -249,7 +249,7 @@ export default function Add() {
                       </Typo>
                     </Cell>
                     <Cell padding="none">
-                      <Link href={`/add/${game.uuid}`}>
+                      <Link href={`/add/commit?uuid=${game.uuid}`}>
                         <Button fullWidth transparent>
                           <IconEdit />
                         </Button>

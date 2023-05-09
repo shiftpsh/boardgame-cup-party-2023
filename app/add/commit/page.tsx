@@ -15,6 +15,7 @@ import {
 } from "@solved-ac/ui-react";
 import { useEffect, useMemo, useState } from "react";
 
+import { PageProps } from "@/.next/types/app/page";
 import USERS from "@/app/users.json";
 import AnimatedNumber from "@/component/AnimatedNumber";
 import Emoji from "@/component/Emoji";
@@ -29,7 +30,6 @@ import styled from "@emotion/styled";
 import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
 import { FirebaseError } from "firebase/app";
 import { ref, set } from "firebase/database";
-import { useParams } from "next/navigation";
 import {
   DragDropContext,
   Draggable,
@@ -46,12 +46,12 @@ const DndRow = styled(Row)`
   grid-template-columns: 1fr 2fr 1fr 1fr;
 `;
 
-export default function Add() {
+const Page = (props: PageProps) => {
   const auth = useAuth();
   const snackbar = useSnackbar();
   const games = useGames();
 
-  const { uuid } = useParams();
+  const { uuid } = props.searchParams || {};
 
   const [result, setResult] = useState<GameResultRank[]>([]);
   const [adding, setAdding] = useState<boolean>(false);
@@ -303,4 +303,6 @@ export default function Add() {
       <Space h={64} />
     </Container>
   );
-}
+};
+
+export default Page;
