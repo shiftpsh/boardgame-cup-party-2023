@@ -1,8 +1,8 @@
 import AnimatedNumber from "@/component/AnimatedNumber";
 import OngoingIcon from "@/component/OngoingIcon";
 import { Phase } from "@/hooks/useAwardMode";
-import { ScoreboardUser } from "@/hooks/useScoreboard";
 import { theme } from "@/styles/theme";
+import { ScoreboardUser } from "@/types/Scoreboard";
 import { ThemeProvider, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Space, Typo } from "@solved-ac/ui-react";

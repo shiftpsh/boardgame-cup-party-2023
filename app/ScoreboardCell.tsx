@@ -3,7 +3,7 @@ import Emoji from "@/component/Emoji";
 import {
   ScoreboardGameScoreEntry,
   ScoreboardSolveScoreEntry,
-} from "@/hooks/useScoreboard";
+} from "@/types/Scoreboard";
 import { gameById } from "@/utils/game";
 import styled from "@emotion/styled";
 import { Tooltip, Typo } from "@solved-ac/ui-react";

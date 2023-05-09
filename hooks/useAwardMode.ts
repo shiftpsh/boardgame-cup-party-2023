@@ -1,6 +1,6 @@
+import { useGames } from "@/context/GamesContext";
 import { useEffect, useMemo, useState } from "react";
 import { useGranularEffect } from "./useGranularEffect";
-import useScoreboard from "./useScoreboard";
 
 interface PhaseUserIn {
   type: "user-in";
@@ -32,7 +32,7 @@ export interface Phase {
 }
 
 const useAwardMode = () => {
-  const scoreboard = useScoreboard();
+  const { scoreboard } = useGames();
   const [awardMode, setAwardMode] = useState(false);
   const [phase, setPhase] = useState<Phase | null>(null);
   const [finishedUsers, setFinishedUsers] = useState<Set<string>>(
@@ -50,7 +50,7 @@ const useAwardMode = () => {
   }, [scoreboard]);
 
   const unfrozen = useMemo(() => {
-    const rankMap = new Map<number, number>();
+    const rankMap = new Map<string, number>();
 
     return scoreboard
       .map((s) => {
@@ -73,10 +73,15 @@ const useAwardMode = () => {
           score,
         };
       })
-      .sort((a, b) => b.score - a.score)
+      .sort((a, b) =>
+        a.score !== b.score
+          ? b.score - a.score
+          : a.lastScoreUpdateTime - b.lastScoreUpdateTime
+      )
       .map((x, i) => {
-        const rank = rankMap.get(x.score) ?? i + 1;
-        rankMap.set(x.score, rank);
+        const key = `${x.score}-${x.lastScoreUpdateTime}`;
+        const rank = rankMap.get(key) ?? i + 1;
+        rankMap.set(key, rank);
         return { ...x, rank };
       })
       .sort((a, b) => {
