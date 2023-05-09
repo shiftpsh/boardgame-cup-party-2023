@@ -1,4 +1,5 @@
-import { useMotionValue, useSpring } from "framer-motion";
+import { useGranularEffect } from "@/hooks/useGranularEffect";
+import { animate, useMotionValue } from "framer-motion";
 import { useEffect, useRef } from "react";
 
 const DEFAULT_FORMAT = (value: number) =>
@@ -15,20 +16,27 @@ interface Props {
 const AnimatedNumber = ({ value, format = DEFAULT_FORMAT }: Props) => {
   const ref = useRef<HTMLSpanElement>(null);
   const motionValue = useMotionValue(0);
-  const springValue = useSpring(motionValue);
+  // const springValue = useSpring(motionValue);
 
-  useEffect(() => {
-    motionValue.set(value);
-  }, [motionValue, value]);
+  useGranularEffect(
+    () => {
+      animate(motionValue, value, {
+        duration: 0.5,
+        ease: "easeOut",
+      });
+    },
+    [value],
+    [motionValue]
+  );
 
   useEffect(
     () =>
-      springValue.onChange((latest: number) => {
+      motionValue.onChange((latest: number) => {
         if (ref.current) {
           ref.current.textContent = format(latest);
         }
       }),
-    [format, springValue]
+    [format, motionValue]
   );
 
   return <span ref={ref}>{format(value)}</span>;

@@ -5,13 +5,16 @@ import useFreezeTime from "@/hooks/useFreezeTime";
 import { UserResponse } from "@/types/UserResponse";
 import { db } from "@/utils/database";
 import {
+  Button,
   Container,
   EmptyStatePlaceholder,
   Space,
   TextField,
   Typo,
 } from "@solved-ac/ui-react";
+import { IconInfoCircle } from "@tabler/icons-react";
 import { onValue, ref } from "firebase/database";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import AdminAdd from "./AdminAdd";
 import AdminList from "./AdminList";
@@ -97,6 +100,16 @@ export default function Setting() {
             fullWidth
           />
         </div>
+        <Space h={32} />
+        <Typo h2>어워드 모드</Typo>
+        <Space h={8} />
+        <Link href="/?award=true">
+          <Button fullWidth>어워드 모드</Button>
+        </Link>
+        <Space h={8} />
+        <Typo description>
+          <IconInfoCircle /> 키보드 버튼 Space를 눌러 진행할 수 있습니다.
+        </Typo>
         <Space h={32} />
         <Typo h2>관리자 목록</Typo>
         <AdminList adminUIDs={adminEmails} users={users} />

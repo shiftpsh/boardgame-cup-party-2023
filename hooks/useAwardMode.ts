@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useGranularEffect } from "./useGranularEffect";
 import useScoreboard from "./useScoreboard";
 
 interface PhaseUserIn {
@@ -30,6 +31,8 @@ export interface Phase {
   phase: PhaseType;
 }
 
+const FLY_TIMEOUT = 1500;
+
 const useAwardMode = () => {
   const scoreboard = useScoreboard();
   const [awardMode, setAwardMode] = useState(false);
@@ -40,6 +43,13 @@ const useAwardMode = () => {
   const [finishedUUIDHandles, setFinishedUUIDHandles] = useState<Set<string>>(
     new Set<string>()
   );
+  const [renderIndex, setRenderIndex] = useState<Map<string, number>>(
+    new Map()
+  );
+
+  useEffect(() => {
+    setRenderIndex(new Map(scoreboard.map((x, i) => [x.handle, i])));
+  }, [scoreboard]);
 
   const unfrozen = useMemo(() => {
     const rankMap = new Map<number, number>();
@@ -70,8 +80,29 @@ const useAwardMode = () => {
         const rank = rankMap.get(x.score) ?? i + 1;
         rankMap.set(x.score, rank);
         return { ...x, rank };
+      })
+      .sort((a, b) => {
+        const aRank = renderIndex.get(a.handle) ?? a.rank;
+        const bRank = renderIndex.get(b.handle) ?? b.rank;
+        return aRank - bRank;
       });
-  }, [finishedUUIDHandles, scoreboard]);
+  }, [finishedUUIDHandles, renderIndex, scoreboard]);
+
+  useGranularEffect(
+    () => {
+      if (phase?.phase.type === "user-out") {
+        setRenderIndex(
+          new Map(
+            unfrozen
+              .sort((a, b) => a.rank - b.rank)
+              .map((x, i) => [x.handle, i])
+          )
+        );
+      }
+    },
+    [phase?.phase.type],
+    [unfrozen]
+  );
 
   const { handle: nextHandle } = useMemo(() => {
     const leastRankWithNotFinishedUser = unfrozen.reduce(

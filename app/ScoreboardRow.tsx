@@ -14,6 +14,7 @@ import ScoreboardCell from "./ScoreboardCell";
 import ScoreboardCellOngoing from "./ScoreboardCellOngoing";
 
 const ScoreboardRowWrapper = styled(motion.tr)`
+  position: relative;
   white-space: nowrap;
   word-break: keep-all;
   height: 96px;
@@ -148,7 +149,13 @@ const ScoreboardRow = ({ user, phase, finished }: Props) => {
         },
       }}
     >
-      <ScoreboardRowWrapper layoutId={user.handle} ref={ref}>
+      <ScoreboardRowWrapper
+        layoutId={user.handle}
+        ref={ref}
+        style={{
+          zIndex: phase?.phase?.type === "user-out" ? 10000 : 0,
+        }}
+      >
         <ScoreboardScore>
           <ScoreboardScoreWrapper>
             {user.ongoingGames.length !== 0 && (

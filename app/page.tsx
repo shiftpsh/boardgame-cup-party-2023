@@ -39,7 +39,7 @@ export default function Home() {
   useEffect(() => {
     if (!awardMode) return undefined;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "a") {
+      if (e.key === " ") {
         e.preventDefault();
         onNextPhase();
       }
@@ -118,10 +118,8 @@ export default function Home() {
               layout
               layoutRoot
               transition={{
-                layout: {
-                  duration: 1,
-                  delay: 2,
-                },
+                ease: "easeInOut",
+                duration: 1,
               }}
             >
               {scoreboard.map((row) => (
