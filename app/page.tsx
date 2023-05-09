@@ -1,19 +1,52 @@
 "use client";
 
+import { useAuth } from "@/context/AuthContext";
+import useAwardMode from "@/hooks/useAwardMode";
 import useElapsedTime from "@/hooks/useElapsedTime";
 import useFreezeTime from "@/hooks/useFreezeTime";
-import useScoreboard from "@/hooks/useScoreboard";
 import { Divider, Space, Typo } from "@solved-ac/ui-react";
-import { motion } from "framer-motion";
-import React, { useMemo } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useSearchParams } from "next/navigation";
+import React, { useEffect, useMemo } from "react";
 import GamePlayingItem from "./GamePlayingItem";
 import ScoreboardRow from "./ScoreboardRow";
 
 export default function Home() {
-  const scoreboard = useScoreboard();
+  const auth = useAuth();
+  const {
+    awardMode,
+    setAwardMode,
+    unfrozen: scoreboard,
+    phase,
+    onNextPhase,
+    finishedUsers,
+  } = useAwardMode();
   const [freezeTime] = useFreezeTime();
   const elapsedTime = useElapsedTime(freezeTime);
   const secondsUntilFreeze = Math.floor(-elapsedTime / 1000);
+
+  const searchParams = useSearchParams();
+  const awardModeFlag = (searchParams.get("award") || "") === "true";
+
+  useEffect(() => {
+    if (awardModeFlag && auth.isAdmin) {
+      setAwardMode(awardModeFlag);
+    } else {
+      setAwardMode(false);
+    }
+  }, [auth.isAdmin, awardModeFlag, setAwardMode]);
+
+  useEffect(() => {
+    if (!awardMode) return undefined;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "a") {
+        e.preventDefault();
+        onNextPhase();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [awardMode, onNextPhase]);
 
   const gamesPlaying = useMemo(
     () =>
@@ -80,18 +113,33 @@ export default function Home() {
             width: "100%",
           }}
         >
-          <motion.tbody layout>
-            {scoreboard.map((row) => (
-              <React.Fragment key={row.handle}>
-                <ScoreboardRow user={row} />
-                <tr>
-                  <td colSpan={3}>
-                    <Divider margin="none" />
-                  </td>
-                </tr>
-              </React.Fragment>
-            ))}
-          </motion.tbody>
+          <AnimatePresence>
+            <motion.tbody
+              layout
+              layoutRoot
+              transition={{
+                layout: {
+                  duration: 1,
+                  delay: 2,
+                },
+              }}
+            >
+              {scoreboard.map((row) => (
+                <React.Fragment key={row.handle}>
+                  <ScoreboardRow
+                    user={row}
+                    finished={finishedUsers.has(row.handle)}
+                    phase={phase?.handle === row.handle ? phase : null}
+                  />
+                  <tr>
+                    <td colSpan={3}>
+                      <Divider margin="none" />
+                    </td>
+                  </tr>
+                </React.Fragment>
+              ))}
+            </motion.tbody>
+          </AnimatePresence>
         </table>
       </div>
     </>

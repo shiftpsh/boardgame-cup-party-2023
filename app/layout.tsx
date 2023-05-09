@@ -32,6 +32,9 @@ export default function RootLayout({
                     verticalAlign: "middle",
                     height: "1.15em",
                   },
+                  body: {
+                    overflowAnchor: "none",
+                  },
                 }}
               />
               <TopBar />

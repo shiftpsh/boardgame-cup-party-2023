@@ -1,10 +1,15 @@
 import AnimatedNumber from "@/component/AnimatedNumber";
 import OngoingIcon from "@/component/OngoingIcon";
+import { Phase } from "@/hooks/useAwardMode";
 import { ScoreboardUser } from "@/hooks/useScoreboard";
+import { theme } from "@/styles/theme";
+import { ThemeProvider, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Space, Typo } from "@solved-ac/ui-react";
 import { IconQuestionMark } from "@tabler/icons-react";
 import { motion } from "framer-motion";
+import { mix } from "polished";
+import { useEffect, useRef } from "react";
 import ScoreboardCell from "./ScoreboardCell";
 import ScoreboardCellOngoing from "./ScoreboardCellOngoing";
 
@@ -13,6 +18,7 @@ const ScoreboardRowWrapper = styled(motion.tr)`
   word-break: keep-all;
   height: 96px;
   direction: ltr;
+  background: ${({ theme }) => theme.color.background.page};
   @media (min-width: 768px) {
     height: 72px;
   }
@@ -90,14 +96,59 @@ const Rank = styled.div`
   color: ${({ theme }) => theme.color.text.primary.light};
 `;
 
+const useColor = (phase: Phase | null, finished: boolean) => {
+  const theme = useTheme();
+  const { type } = phase?.phase || {};
+  if (!type && finished) {
+    return mix(0.2, theme.color.text.secondary.main, "white");
+  }
+  if (
+    type === "user-in" ||
+    type === "user-game-in" ||
+    type === "user-game-out"
+  ) {
+    return mix(0.2, theme.color.status.warn, "white");
+  }
+  if (type === "user-out") {
+    return mix(0.2, theme.color.solvedAc, "white");
+  }
+  return theme.color.background.page;
+};
+
 interface Props {
   user: ScoreboardUser;
+  finished: boolean;
+  phase: Phase | null;
 }
 
-const ScoreboardRow = ({ user }: Props) => {
+const ScoreboardRow = ({ user, phase, finished }: Props) => {
+  const color = useColor(phase, finished);
+
+  const ref = useRef<HTMLTableRowElement>(null);
+
+  useEffect(() => {
+    if (phase?.phase?.type === "user-in") {
+      ref.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      });
+    }
+  }, [phase?.phase?.type]);
+
   return (
-    <>
-      <ScoreboardRowWrapper layoutId={user.handle}>
+    <ThemeProvider
+      theme={{
+        color: {
+          ...theme.color,
+          background: {
+            ...theme.color.background,
+            page: color,
+          },
+        },
+      }}
+    >
+      <ScoreboardRowWrapper layoutId={user.handle} ref={ref}>
         <ScoreboardScore>
           <ScoreboardScoreWrapper>
             {user.ongoingGames.length !== 0 && (
@@ -126,6 +177,11 @@ const ScoreboardRow = ({ user }: Props) => {
             {user.scoreEntries.map((entry) => (
               <ScoreboardCell
                 data={entry}
+                current={
+                  phase?.phase?.type === "user-game-in" &&
+                  entry.type === "game" &&
+                  phase.phase.uuid === entry.game.uuid
+                }
                 key={entry.type === "solves" ? "solves" : entry.game.uuid}
               />
             ))}
@@ -159,6 +215,11 @@ const ScoreboardRow = ({ user }: Props) => {
             {user.scoreEntries.map((entry) => (
               <ScoreboardCell
                 data={entry}
+                current={
+                  phase?.phase?.type === "user-game-in" &&
+                  entry.type === "game" &&
+                  phase.phase.uuid === entry.game.uuid
+                }
                 key={entry.type === "solves" ? "solves" : entry.game.uuid}
               />
             ))}
@@ -168,7 +229,7 @@ const ScoreboardRow = ({ user }: Props) => {
           </ScoreboardContentsWrapper>
         </td>
       </ScoreboardContentsNarrow>
-    </>
+    </ThemeProvider>
   );
 };
 

@@ -15,9 +15,10 @@ const ScoreboardCellWrapper = styled.div`
 
 interface Props {
   data: ScoreboardGameScoreEntry | ScoreboardSolveScoreEntry;
+  current: boolean;
 }
 
-const ScoreboardCell = ({ data }: Props) => {
+const ScoreboardCell = ({ data, current }: Props) => {
   const gameId = data.type === "solves" ? "custom" : data.game.gameId;
   const game = gameById(gameId);
   const elapsedTime =
@@ -25,13 +26,20 @@ const ScoreboardCell = ({ data }: Props) => {
 
   return (
     <ScoreboardCellWrapper
-      style={
-        data.score === null
+      style={{
+        ...(data.frozen
           ? {
               opacity: 0.5,
             }
-          : {}
-      }
+          : {}),
+        ...(current
+          ? {
+              boxShadow: "0 0 8px 2px white",
+              background: "white",
+              opacity: 1,
+            }
+          : {}),
+      }}
     >
       <Typo
         h3
@@ -42,12 +50,12 @@ const ScoreboardCell = ({ data }: Props) => {
           fontWeight: "initial",
         }}
       >
-        {data.score !== null ? (
-          <AnimatedNumber value={data.score} />
-        ) : (
+        {data.frozen ? (
           <Typo description>
             <IconQuestionMark />
           </Typo>
+        ) : (
+          <AnimatedNumber value={data.score} />
         )}
       </Typo>
       <Typo description>
@@ -60,7 +68,7 @@ const ScoreboardCell = ({ data }: Props) => {
           </>
         ) : (
           <>
-            {data.score === null ? (
+            {data.frozen ? (
               <>
                 {Math.floor(elapsedTime / 60 / 1000)}
                 <Typo small>분</Typo>
