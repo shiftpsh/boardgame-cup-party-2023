@@ -18,7 +18,7 @@ export interface ScoreboardGameScoreEntry {
 
 export interface ScoreboardSolveScoreEntry {
   type: "solves";
-  score: number | null;
+  score: number;
   solves: number;
 }
 
