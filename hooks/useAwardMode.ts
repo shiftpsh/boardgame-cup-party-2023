@@ -31,8 +31,6 @@ export interface Phase {
   phase: PhaseType;
 }
 
-const FLY_TIMEOUT = 1500;
-
 const useAwardMode = () => {
   const scoreboard = useScoreboard();
   const [awardMode, setAwardMode] = useState(false);

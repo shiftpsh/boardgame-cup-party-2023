@@ -1,10 +1,16 @@
 "use client";
 
+import OngoingIcon from "@/component/OngoingIcon";
 import { useAuth } from "@/context/AuthContext";
+import { useGames } from "@/context/GamesContext";
 import useAwardMode from "@/hooks/useAwardMode";
 import useElapsedTime from "@/hooks/useElapsedTime";
-import useFreezeTime from "@/hooks/useFreezeTime";
-import { Divider, Space, Typo } from "@solved-ac/ui-react";
+import {
+  Divider,
+  EmptyStatePlaceholder,
+  Space,
+  Typo,
+} from "@solved-ac/ui-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useMemo } from "react";
@@ -13,6 +19,8 @@ import ScoreboardRow from "./ScoreboardRow";
 
 export default function Home() {
   const auth = useAuth();
+  const { gamesLoaded, freezeAt } = useGames();
+
   const {
     awardMode,
     setAwardMode,
@@ -21,8 +29,7 @@ export default function Home() {
     onNextPhase,
     finishedUsers,
   } = useAwardMode();
-  const [freezeTime] = useFreezeTime();
-  const elapsedTime = useElapsedTime(freezeTime);
+  const elapsedTime = useElapsedTime(freezeAt);
   const secondsUntilFreeze = Math.floor(-elapsedTime / 1000);
 
   const searchParams = useSearchParams();
@@ -55,6 +62,22 @@ export default function Home() {
       ),
     [scoreboard]
   );
+
+  if (!gamesLoaded) {
+    return (
+      <>
+        <Space h={64} />
+        <EmptyStatePlaceholder
+          style={{
+            fontSize: "4em",
+          }}
+        >
+          <OngoingIcon />
+        </EmptyStatePlaceholder>
+        <Space h={64} />
+      </>
+    );
+  }
 
   return (
     <>

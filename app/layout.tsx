@@ -1,6 +1,7 @@
 "use client";
 import TopBar from "@/component/TopBar";
 import { AuthContextProvider } from "@/context/AuthContext";
+import { GamesContextProvider } from "@/context/GamesContext";
 import { SnackbarProvider } from "@/context/SnackbarContext";
 import { theme } from "@/styles/theme";
 import { Global, ThemeProvider } from "@emotion/react";
@@ -15,33 +16,35 @@ export default function RootLayout({
     <ThemeProvider theme={theme}>
       <SnackbarProvider>
         <AuthContextProvider>
-          <html lang="ko">
-            <head>
-              <link
-                rel="stylesheet"
-                as="style"
-                crossOrigin="anonymous"
-                href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.6/dist/web/static/pretendard-dynamic-subset.css"
-              />
-            </head>
-            <body>
-              <SolvedGlobalStyles />
-              <Global
-                styles={{
-                  ".tabler-icon": {
-                    verticalAlign: "middle",
-                    height: "1.15em",
-                  },
-                  body: {
-                    overflowAnchor: "none",
-                  },
-                }}
-              />
-              <TopBar />
+          <GamesContextProvider>
+            <html lang="ko">
+              <head>
+                <link
+                  rel="stylesheet"
+                  as="style"
+                  crossOrigin="anonymous"
+                  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.6/dist/web/static/pretendard-dynamic-subset.css"
+                />
+              </head>
+              <body>
+                <SolvedGlobalStyles />
+                <Global
+                  styles={{
+                    ".tabler-icon": {
+                      verticalAlign: "middle",
+                      height: "1.15em",
+                    },
+                    body: {
+                      overflowAnchor: "none",
+                    },
+                  }}
+                />
+                <TopBar />
 
-              {children}
-            </body>
-          </html>
+                {children}
+              </body>
+            </html>
+          </GamesContextProvider>
         </AuthContextProvider>
       </SnackbarProvider>
     </ThemeProvider>

@@ -1,4 +1,5 @@
 import USERS from "@/app/users.json";
+import { useGames } from "@/context/GamesContext";
 import {
   GameResultFinished,
   GameResultRank,
@@ -6,8 +7,6 @@ import {
 } from "@/types/GameResult";
 import { score } from "@/utils/score";
 import { useMemo } from "react";
-import useFreezeTime from "./useFreezeTime";
-import useGames from "./useGames";
 
 export interface ScoreboardGameScoreEntry {
   type: "game";
@@ -34,8 +33,7 @@ export interface ScoreboardUser {
 }
 
 const useScoreboard = () => {
-  const games = useGames();
-  const [freezeTime] = useFreezeTime();
+  const { games, freezeAt } = useGames();
 
   const users: ScoreboardUser[] = useMemo(() => {
     const rankMap = new Map<number, number>();
@@ -63,7 +61,7 @@ const useScoreboard = () => {
         },
         ...finished.map((game) => {
           const player = game.result.find((x) => x.handle === handle)!;
-          const frozen = freezeTime < game.finishedAt;
+          const frozen = freezeAt < game.finishedAt;
           const resultScore = score(
             game.result.length,
             game.durationMinutes,
@@ -103,7 +101,7 @@ const useScoreboard = () => {
           rank,
         };
       });
-  }, [freezeTime, games]);
+  }, [freezeAt, games]);
 
   return users;
 };

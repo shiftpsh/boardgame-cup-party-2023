@@ -22,8 +22,8 @@ import USERS from "@/app/users.json";
 import ElapsedTime from "@/component/ElapsedTime";
 import Emoji from "@/component/Emoji";
 import { useAuth } from "@/context/AuthContext";
+import { useGames } from "@/context/GamesContext";
 import { useSnackbar } from "@/context/SnackbarContext";
-import useGames from "@/hooks/useGames";
 import { db } from "@/utils/database";
 import { gameById } from "@/utils/game";
 import styled from "@emotion/styled";
@@ -48,7 +48,7 @@ const UserButtons = styled.div`
 export default function Add() {
   const auth = useAuth();
   const snackbar = useSnackbar();
-  const games = useGames();
+  const { games } = useGames();
 
   const [gameId, setGameId] = useState<string>("terraforming-mars");
   const [players, setPlayers] = useState<string[]>([]);

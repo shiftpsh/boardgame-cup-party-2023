@@ -20,9 +20,9 @@ import USERS from "@/app/users.json";
 import AnimatedNumber from "@/component/AnimatedNumber";
 import Emoji from "@/component/Emoji";
 import { useAuth } from "@/context/AuthContext";
+import { useGames } from "@/context/GamesContext";
 import { useSnackbar } from "@/context/SnackbarContext";
 import useElapsedTime from "@/hooks/useElapsedTime";
-import useGames from "@/hooks/useGames";
 import { db } from "@/utils/database";
 import { gameById } from "@/utils/game";
 import { score } from "@/utils/score";
@@ -50,7 +50,7 @@ const DndRow = styled(Row)`
 const Page = (props: PageProps) => {
   const auth = useAuth();
   const snackbar = useSnackbar();
-  const games = useGames();
+  const { games } = useGames();
 
   const searchParams = useSearchParams();
   const uuid = searchParams.get("uuid") || "";

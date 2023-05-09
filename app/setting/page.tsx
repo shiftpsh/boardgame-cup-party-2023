@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import useFreezeTime from "@/hooks/useFreezeTime";
+import { useGames } from "@/context/GamesContext";
 import { UserResponse } from "@/types/UserResponse";
 import { db } from "@/utils/database";
 import {
@@ -22,7 +22,7 @@ import AdminList from "./AdminList";
 export default function Setting() {
   const auth = useAuth();
 
-  const [freezeAt, setFreezeTime] = useFreezeTime();
+  const { freezeAt, setFreezeAt } = useGames();
   const timezoneOffset = new Date().getTimezoneOffset() * 60000;
   const freezeAtKst = new Date(freezeAt - timezoneOffset).toISOString();
 
@@ -59,13 +59,13 @@ export default function Setting() {
   const handleFreezeDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const date = e.target.value;
     const time = freezeAtKst.split("T")[1].slice(0, 5);
-    setFreezeTime(new Date(`${date}T${time}+09:00`).getTime());
+    setFreezeAt(new Date(`${date}T${time}+09:00`).getTime());
   };
 
   const handleFreezeTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const date = freezeAtKst.split("T")[0];
     const time = e.target.value;
-    setFreezeTime(new Date(`${date}T${time}+09:00`).getTime());
+    setFreezeAt(new Date(`${date}T${time}+09:00`).getTime());
   };
 
   if (!auth.isAdmin) {
