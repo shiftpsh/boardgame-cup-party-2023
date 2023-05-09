@@ -116,12 +116,55 @@ export default function Add() {
         );
       }
     });
+    const playerLastGames = players.map((player) => {
+      const lastGames = games
+        .filter((x) => "finishedAt" in x)
+        .filter((x) => x.players.includes(player))
+        .sort((a, b) => b.startedAt - a.startedAt);
+      if (lastGames.length > 0) {
+        return { player, lastGame: lastGames[0], uuid: lastGames[0].uuid };
+      } else {
+        return { player, lastGame: null, uuid: null };
+      }
+    });
+    playerLastGames.forEach((playerLastGame) => {
+      if (!playerLastGame.lastGame) return;
+      const lastGame = playerLastGame.lastGame;
+      if (lastGame.gameId === gameId) {
+        warns.push(
+          `${playerLastGame.player}님이 직전에 ${game.name}를 플레이함`
+        );
+      }
+    });
+    const playerLastGameUUIDs = new Set(
+      playerLastGames
+        .map((playerLastGame) => playerLastGame.uuid)
+        .filter((x) => x !== null) as string[]
+    );
+    if (playerLastGameUUIDs.size === 1) {
+      const lastGameUUID = playerLastGameUUIDs.values().next().value;
+      const lastGame = games.find((x) => x.uuid === lastGameUUID);
+      const lastGamePlayers = new Set(lastGame?.players ?? []);
+      const players = new Set(playerLastGames.map((x) => x.player));
+
+      if (lastGamePlayers.size === players.size) {
+        const diff = new Set(
+          Array.from(players).filter((x) => !lastGamePlayers.has(x))
+        );
+        if (diff.size === 0) {
+          warns.push(
+            `이 플레이어 집합은 직전에 동일한 플레이어 집합으로 ${game.name}를 플레이함`
+          );
+        }
+      }
+    }
     return warns;
   }, [
     game.name,
     game.players.max,
     game.players.min,
     gameId,
+    games,
     ongoingGames,
     players,
   ]);
