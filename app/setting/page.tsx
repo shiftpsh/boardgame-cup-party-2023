@@ -1,13 +1,15 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
+import useFreezeTime from "@/hooks/useFreezeTime";
 import { UserResponse } from "@/types/UserResponse";
 import { db } from "@/utils/database";
 import {
-    Container,
-    EmptyStatePlaceholder,
-    Space,
-    Typo,
+  Container,
+  EmptyStatePlaceholder,
+  Space,
+  TextField,
+  Typo,
 } from "@solved-ac/ui-react";
 import { onValue, ref } from "firebase/database";
 import { useEffect, useState } from "react";
@@ -16,6 +18,10 @@ import AdminList from "./AdminList";
 
 export default function Setting() {
   const auth = useAuth();
+
+  const [freezeAt, setFreezeTime] = useFreezeTime();
+  const timezoneOffset = new Date().getTimezoneOffset() * 60000;
+  const freezeAtKst = new Date(freezeAt - timezoneOffset).toISOString();
 
   const [adminEmails, setAdminEmails] = useState<string[]>([]);
   const [users, setUsers] = useState<Map<string, UserResponse>>(new Map());
@@ -47,6 +53,18 @@ export default function Setting() {
     return unsubscribe;
   }, []);
 
+  const handleFreezeDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const date = e.target.value;
+    const time = freezeAtKst.split("T")[1].slice(0, 5);
+    setFreezeTime(new Date(`${date}T${time}+09:00`).getTime());
+  };
+
+  const handleFreezeTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const date = freezeAtKst.split("T")[0];
+    const time = e.target.value;
+    setFreezeTime(new Date(`${date}T${time}+09:00`).getTime());
+  };
+
   if (!auth.isAdmin) {
     return (
       <Container>
@@ -58,6 +76,27 @@ export default function Setting() {
   return (
     <>
       <Container>
+        <Space h={32} />
+        <Typo h2>프리즈</Typo>
+        <div
+          style={{
+            display: "flex",
+            gap: "0 8px",
+          }}
+        >
+          <TextField<"input">
+            type="date"
+            value={freezeAtKst.split("T")[0]}
+            onChange={handleFreezeDateChange}
+            fullWidth
+          />
+          <TextField<"input">
+            type="time"
+            value={freezeAtKst.split("T")[1].slice(0, 5)}
+            onChange={handleFreezeTimeChange}
+            fullWidth
+          />
+        </div>
         <Space h={32} />
         <Typo h2>관리자 목록</Typo>
         <AdminList adminUIDs={adminEmails} users={users} />

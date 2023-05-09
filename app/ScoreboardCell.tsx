@@ -1,8 +1,8 @@
 import AnimatedNumber from "@/component/AnimatedNumber";
 import Emoji from "@/component/Emoji";
 import {
-    ScoreboardGameScoreEntry,
-    ScoreboardSolveScoreEntry,
+  ScoreboardGameScoreEntry,
+  ScoreboardSolveScoreEntry,
 } from "@/hooks/useScoreboard";
 import { gameById } from "@/utils/game";
 import styled from "@emotion/styled";
@@ -19,9 +19,19 @@ interface Props {
 const ScoreboardCell = ({ data }: Props) => {
   const gameId = data.type === "solves" ? "custom" : data.game.gameId;
   const game = gameById(gameId);
+  const elapsedTime =
+    data.type === "solves" ? 0 : data.game.finishedAt - data.game.startedAt;
 
   return (
-    <ScoreboardCellWrapper>
+    <ScoreboardCellWrapper
+      style={
+        data.score === null
+          ? {
+              opacity: 0.5,
+            }
+          : {}
+      }
+    >
       <Typo
         h3
         no-margin
@@ -31,7 +41,11 @@ const ScoreboardCell = ({ data }: Props) => {
           fontWeight: "initial",
         }}
       >
-        <AnimatedNumber value={data.score} />
+        {data.score !== null ? (
+          <AnimatedNumber value={data.score} />
+        ) : (
+          <Typo description>?</Typo>
+        )}
       </Typo>
       <Typo description>
         {data.type === "solves" ? (
@@ -43,7 +57,14 @@ const ScoreboardCell = ({ data }: Props) => {
           </>
         ) : (
           <>
-            #{data.result.rank}{" "}
+            {data.score === null ? (
+              <>
+                {Math.floor(elapsedTime / 60 / 1000)}
+                <Typo small>분</Typo>
+              </>
+            ) : (
+              <>#{data.result.rank}</>
+            )}{" "}
             <Tooltip title={game.name}>
               <Emoji emoji={game.emoji} />
             </Tooltip>

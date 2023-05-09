@@ -6,18 +6,19 @@ import {
 } from "@/types/GameResult";
 import { score } from "@/utils/score";
 import { useMemo } from "react";
+import useFreezeTime from "./useFreezeTime";
 import useGames from "./useGames";
 
 export interface ScoreboardGameScoreEntry {
   type: "game";
-  score: number;
+  score: number | null;
   game: GameResultFinished;
   result: GameResultRank;
 }
 
 export interface ScoreboardSolveScoreEntry {
   type: "solves";
-  score: number;
+  score: number | null;
   solves: number;
 }
 
@@ -32,6 +33,7 @@ export interface ScoreboardUser {
 
 const useScoreboard = () => {
   const games = useGames();
+  const [freezeTime] = useFreezeTime();
 
   const users: ScoreboardUser[] = useMemo(() => {
     const rankMap = new Map<number, number>();
@@ -58,11 +60,14 @@ const useScoreboard = () => {
         },
         ...finished.map((game) => {
           const player = game.result.find((x) => x.handle === handle)!;
+          const frozen = freezeTime < game.finishedAt;
+          const resultScore = frozen
+            ? null
+            : score(game.result.length, game.durationMinutes, player.rank);
+
           return {
             type: "game",
-            score: player.exclude
-              ? 0
-              : score(game.result.length, game.durationMinutes, player.rank),
+            score: player.exclude ? 0 : resultScore,
             game,
             result: player,
           } as const;
@@ -70,7 +75,7 @@ const useScoreboard = () => {
       ];
 
       const scoreTotal = scoreEntries.reduce(
-        (acc, { score }) => acc + score,
+        (acc, { score }) => acc + (score || 0),
         0
       );
 
@@ -92,7 +97,7 @@ const useScoreboard = () => {
           rank,
         };
       });
-  }, [games]);
+  }, [freezeTime, games]);
 
   return users;
 };
