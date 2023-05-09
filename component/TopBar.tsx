@@ -20,6 +20,17 @@ const TopBarButton = styled(Button)`
   justify-content: center;
 `;
 
+const DenseTab = styled(Tab)`
+  min-width: 36px;
+  padding-left: 8px;
+  padding-right: 8px;
+  @media (min-width: 768px) {
+    min-width: 72px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+`;
+
 const TopBar = () => {
   const auth = useAuth();
   const pathname = usePathname();
@@ -28,14 +39,19 @@ const TopBar = () => {
     <TopContainer>
       <Tabs>
         <Link href="/" passHref legacyBehavior>
-          <Tab current={pathname === "/"} as="a">
-            스코어보드
-          </Tab>
+          <DenseTab current={pathname === "/"} as="a">
+            랭킹
+          </DenseTab>
+        </Link>
+        <Link href="/rules" passHref legacyBehavior>
+          <DenseTab current={pathname === "/rules"} as="a">
+            규칙
+          </DenseTab>
         </Link>
         <Link href="/calculator" passHref legacyBehavior>
-          <Tab current={pathname === "/calculator"} as="a">
-            점수 계산
-          </Tab>
+          <DenseTab current={pathname === "/calculator"} as="a">
+            계산기
+          </DenseTab>
         </Link>
       </Tabs>
       <div style={{ flex: 1 }} />
