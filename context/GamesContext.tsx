@@ -92,7 +92,7 @@ export const GamesContextProvider = ({ children }: PropsWithChildren) => {
       )[] = [
         {
           type: "solves",
-          score: solves * 10,
+          score: solves * 50,
           solves,
           frozen: false,
         },
