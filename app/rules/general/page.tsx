@@ -19,7 +19,7 @@ const Page = () => {
     <>
       <Typo h3>요약</Typo>
       <Itemize>
-        <Item>자유롭게 돌아다니며 원하는 사람과 보드게임을 플레이해요.</Item>
+        <Item>원하는 사람과 보드게임을 플레이해요.</Item>
         <Item>
           게임에 참여하면 게임 결과와 걸린 시간에 따라 점수를 획득할 수 있어요.
         </Item>
@@ -41,8 +41,11 @@ const Page = () => {
       </Paragraph>
       <Typo h3>매칭</Typo>
       <Paragraph>
-        기본적으로 하고 싶은 사람들과 함께 게임을 즐기면 됩니다. 단, 다음 추가
-        규칙이 적용됩니다.
+        기본적으로 하고 싶은 사람들과 함께 게임을 즐기면 됩니다. 하고 싶은 게임에
+        자리가 없다면, 나눠 드린 대기 카드를 놓아 대기할 수 있습니다.
+      </Paragraph>
+      <Paragraph>
+        단, 다음 추가 규칙이 적용됩니다.
       </Paragraph>
       <Itemize>
         <Item>
@@ -56,7 +59,7 @@ const Page = () => {
       </Paragraph>
       <Typo h3>점수: 보드게임컵</Typo>
       <Paragraph>
-        『보드게임컵』 참가 성적에 따라, <b>(해결한 문제) &times; 10점</b>의
+        『보드게임컵』 참가 성적에 따라, <b>(해결한 문제) &times; 50점</b>의
         기본 점수를 가지고 시작합니다.
       </Paragraph>
       <Typo h3>점수: 보드게임 플레이</Typo>
