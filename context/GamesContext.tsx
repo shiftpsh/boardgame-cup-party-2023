@@ -1,20 +1,20 @@
 import USERS from "@/app/users.json";
 import { GameResult, GameResultFinished } from "@/types/GameResult";
 import {
-    ScoreboardGameScoreEntry,
-    ScoreboardSolveScoreEntry,
-    ScoreboardUser,
+  ScoreboardGameScoreEntry,
+  ScoreboardSolveScoreEntry,
+  ScoreboardUser,
 } from "@/types/Scoreboard";
 import { db } from "@/utils/database";
 import { score } from "@/utils/score";
 import { onValue, ref, set } from "firebase/database";
 import {
-    PropsWithChildren,
-    createContext,
-    useContext,
-    useEffect,
-    useMemo,
-    useState,
+  PropsWithChildren,
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
 } from "react";
 
 const defaultFreezeAt = 1683963000000;
@@ -127,7 +127,10 @@ export const GamesContextProvider = ({ children }: PropsWithChildren) => {
         scoreEntries,
         ongoingGames: ongoing,
         rank: 0,
-        lastScoreUpdateTime: Math.max(0, ...finished.map((x) => x.finishedAt)),
+        lastScoreUpdateTime: Math.min(
+          1683968400000,
+          Math.max(0, ...finished.map((x) => x.finishedAt))
+        ),
       };
     })
       .sort((a, b) =>
