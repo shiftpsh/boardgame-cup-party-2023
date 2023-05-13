@@ -359,74 +359,66 @@ export default function Add() {
         ))}
       </UserButtons>
       <Space h={16} />
-      {players.length === 0 ? (
-        <EmptyStatePlaceholder>
-          게임을 입력하지 않았습니다.
-        </EmptyStatePlaceholder>
-      ) : (
-        <>
-          <Table fullWidth padding="dense">
-            <TableHead>
-              <Row>
-                <Cell>핸들</Cell>
-                <Cell>삭제</Cell>
-              </Row>
-            </TableHead>
-            <TableBody>
-              {players.map((handle) => (
-                <Row key={handle}>
-                  <Cell>{handle}</Cell>
-                  <Cell padding="none">
-                    <Button
-                      onClick={() => handleRemoveUser(handle)}
-                      fullWidth
-                      transparent
-                    >
-                      <IconTrash />
-                    </Button>
-                  </Cell>
-                </Row>
-              ))}
-            </TableBody>
-          </Table>
-          <Space h={32} />
-          <Button
-            fullWidth
-            disabled={adding || warnings.length !== 0}
-            onClick={handleAddGameResult}
-          >
-            <IconPlus /> 게임 시작 ({game.name}, {players.length}명)
-          </Button>
-          {warnings.length !== 0 && (
-            <>
-              <Space h={16} />
-              {warnings.map((warning) => (
-                <div key={warning}>
-                  <Typo error>
-                    <IconAlertTriangle /> {warning}
-                  </Typo>
-                </div>
-              ))}
-              <Space h={16} />
-              <div
-                style={{
-                  textAlign: "center",
-                }}
-              >
-                <Typo
-                  description
-                  small
-                  style={{
-                    cursor: "pointer",
-                    textDecoration: "underline",
-                  }}
-                  onClick={handleAddGameResult}
+      <Table fullWidth padding="dense">
+        <TableHead>
+          <Row>
+            <Cell>핸들</Cell>
+            <Cell>삭제</Cell>
+          </Row>
+        </TableHead>
+        <TableBody>
+          {players.map((handle) => (
+            <Row key={handle}>
+              <Cell>{handle}</Cell>
+              <Cell padding="none">
+                <Button
+                  onClick={() => handleRemoveUser(handle)}
+                  fullWidth
+                  transparent
                 >
-                  경고 무시하고 등록하기
-                </Typo>
-              </div>
-            </>
-          )}
+                  <IconTrash />
+                </Button>
+              </Cell>
+            </Row>
+          ))}
+        </TableBody>
+      </Table>
+      <Space h={32} />
+      <Button
+        fullWidth
+        disabled={adding || warnings.length !== 0}
+        onClick={handleAddGameResult}
+      >
+        <IconPlus /> 게임 시작 ({game.name}, {players.length}명)
+      </Button>
+      {warnings.length !== 0 && (
+        <>
+          <Space h={16} />
+          {warnings.map((warning) => (
+            <div key={warning}>
+              <Typo error>
+                <IconAlertTriangle /> {warning}
+              </Typo>
+            </div>
+          ))}
+          <Space h={16} />
+          <div
+            style={{
+              textAlign: "center",
+            }}
+          >
+            <Typo
+              description
+              small
+              style={{
+                cursor: "pointer",
+                textDecoration: "underline",
+              }}
+              onClick={handleAddGameResult}
+            >
+              경고 무시하고 등록하기
+            </Typo>
+          </div>
         </>
       )}
       <Space h={64} />

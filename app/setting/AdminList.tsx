@@ -3,15 +3,15 @@ import { useSnackbar } from "@/context/SnackbarContext";
 import { UserResponse } from "@/types/UserResponse";
 import { db } from "@/utils/database";
 import {
-    Button,
-    Cell,
-    EmptyStatePlaceholder,
-    Row,
-    Table,
-    TableBody,
-    TableContainer,
-    TableHead,
-    Typo,
+  Button,
+  Cell,
+  EmptyStatePlaceholder,
+  Row,
+  Table,
+  TableBody,
+  TableContainer,
+  TableHead,
+  Typo,
 } from "@solved-ac/ui-react";
 import { IconTrash } from "@tabler/icons-react";
 import { FirebaseError } from "firebase/app";
@@ -49,6 +49,15 @@ const AdminList = ({ adminUIDs, users }: Props) => {
       }
     }
   };
+
+  if (
+    ["me@shiftpsh.com", "me@havana.moe"].every((x) => x !== auth.user?.email)
+  ) {
+    return (
+      <EmptyStatePlaceholder>관리자 수정 권한이 없습니다.</EmptyStatePlaceholder>
+    );
+  }
+
 
   if (!adminUIDs.length) {
     return <EmptyStatePlaceholder>관리자가 없습니다.</EmptyStatePlaceholder>;

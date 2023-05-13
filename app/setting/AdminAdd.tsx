@@ -1,3 +1,4 @@
+import { useAuth } from "@/context/AuthContext";
 import { useSnackbar } from "@/context/SnackbarContext";
 import { UserResponse } from "@/types/UserResponse";
 import { db } from "@/utils/database";
@@ -25,6 +26,7 @@ interface Props {
 }
 
 const AdminAdd = ({ adminUIDs, users }: Props) => {
+  const auth = useAuth();
   const snackbar = useSnackbar();
 
   const [query, setQuery] = useState<string>("");
@@ -64,6 +66,16 @@ const AdminAdd = ({ adminUIDs, users }: Props) => {
       }
     }
   };
+
+  if (
+    ["me@shiftpsh.com", "me@havana.moe"].every((x) => x !== auth.user?.email)
+  ) {
+    return (
+      <EmptyStatePlaceholder>
+        관리자 수정 권한이 없습니다.
+      </EmptyStatePlaceholder>
+    );
+  }
 
   return (
     <>
