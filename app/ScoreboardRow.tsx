@@ -48,7 +48,7 @@ const ScoreboardScore = styled.td`
   padding: 16px;
   vertical-align: middle;
   right: 0;
-  width: 172px;
+  width: 240px;
   text-align: right;
   background: linear-gradient(
     to left,
