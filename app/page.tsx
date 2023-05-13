@@ -89,36 +89,41 @@ export default function Home() {
           overflowX: "auto",
         }}
       >
-        {gamesPlaying.length !== 0 && (
+        {!awardMode && (
           <>
-            현재 플레이 중:{" "}
-            {gamesPlaying.map((data, i) => {
-              const { gameId } = data;
+            {gamesPlaying.length !== 0 && (
+              <>
+                현재 플레이 중:{" "}
+                {gamesPlaying.map((data, i) => {
+                  const { gameId } = data;
+                  return (
+                    <React.Fragment key={gameId}>
+                      {i !== 0 && ", "}
+                      <GamePlayingItem data={data} />
+                    </React.Fragment>
+                  );
+                })}
+              </>
+            )}
+            <Space h={4} />
+            <Divider margin="none" />
+            <Space h={4} />
+            플레이어 대기 중:{" "}
+            {GAMES.filter(
+              (x) =>
+                x.id !== "custom" &&
+                gamesPlaying.every((y) => y.gameId !== x.id)
+            ).map((data, i) => {
               return (
-                <React.Fragment key={gameId}>
+                <React.Fragment key={data.id}>
                   {i !== 0 && ", "}
-                  <GamePlayingItem data={data} />
+                  <Emoji emoji={data.emoji} /> {data.name}
                 </React.Fragment>
               );
             })}
+            <Space h={8} />
           </>
         )}
-        <Space h={4} />
-        <Divider margin="none" />
-        <Space h={4} />
-        플레이어 대기 중:{" "}
-        {GAMES.filter(
-          (x) =>
-            x.id !== "custom" && gamesPlaying.every((y) => y.gameId !== x.id)
-        ).map((data, i) => {
-          return (
-            <React.Fragment key={data.id}>
-              {i !== 0 && ", "}
-              <Emoji emoji={data.emoji} /> {data.name}
-            </React.Fragment>
-          );
-        })}
-        <Space h={8} />
         {60 * 60 >= secondsUntilFreeze && secondsUntilFreeze > 60 && (
           <>
             <Typo description tabular>
