@@ -37,6 +37,9 @@ const ScoreboardHandle = styled.td`
     ${({ theme }) => theme.color.background.page} 80%,
     transparent
   );
+  @media (max-width: 768px) {
+    background: transparent;
+  }
 `;
 
 const ScoreboardHandleWrapper = styled.div`
@@ -48,9 +51,18 @@ const ScoreboardScore = styled.td`
   padding: 16px;
   vertical-align: middle;
   right: 0;
-  width: 192px;
+  width: 172px;
   text-align: right;
-  background: white;
+  background: linear-gradient(
+    to left,
+    ${({ theme }) => theme.color.background.page},
+    ${({ theme }) => theme.color.background.page} 80%,
+    transparent
+  );
+  @media (max-width: 768px) {
+    background: transparent;
+    width: auto;
+  }
 `;
 
 const ScoreboardScoreWrapper = styled.div`
