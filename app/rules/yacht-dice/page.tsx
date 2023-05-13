@@ -121,7 +121,7 @@ const Page = () => {
                   <Dice value={5} />
                 </Dices>
               </Cell>
-              <Cell>= 15점</Cell>
+              <Cell>= 20점</Cell>
               <Cell>5가 나온 주사위의 개수 &times; 5</Cell>
             </Row>
             <Row>
