@@ -134,13 +134,13 @@ const Page = () => {
               <Cell>
                 아토즈케 <Typo description>後付け</Typo>
               </Cell>
-              <Cell>허용함 &mdash; 우연에 의한 역만으로도 화료 가능</Cell>
+              <Cell>허용함 &mdash; 우연에 의한 역 만으로도 화료 가능</Cell>
             </Row>
             <Row>
               <Cell>
                 쿠이핑후 <Typo description>喰いピンフ</Typo>
               </Cell>
-              <Cell>1판 20부는 1판 30부의 점수로 계산함</Cell>
+              <Cell>인정하지 않음 &mdash; 핑후는 멘젠 역임</Cell>
             </Row>
             <Row>
               <Cell>절상만관</Cell>
