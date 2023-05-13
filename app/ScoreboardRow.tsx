@@ -48,14 +48,9 @@ const ScoreboardScore = styled.td`
   padding: 16px;
   vertical-align: middle;
   right: 0;
-  width: 240px;
+  width: 192px;
   text-align: right;
-  background: linear-gradient(
-    to left,
-    ${({ theme }) => theme.color.background.page},
-    ${({ theme }) => theme.color.background.page} 80%,
-    transparent
-  );
+  background: white;
 `;
 
 const ScoreboardScoreWrapper = styled.div`
