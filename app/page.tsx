@@ -1,5 +1,7 @@
 "use client";
 
+import GAMES from "@/app/games.json";
+import Emoji from "@/component/Emoji";
 import OngoingIcon from "@/component/OngoingIcon";
 import { useAuth } from "@/context/AuthContext";
 import { useGames } from "@/context/GamesContext";
@@ -101,6 +103,21 @@ export default function Home() {
             })}
           </>
         )}
+        <Space h={4} />
+        <Divider margin="none" />
+        <Space h={4} />
+        플레이어 대기 중:{" "}
+        {GAMES.filter(
+          (x) =>
+            x.id !== "custom" && gamesPlaying.every((y) => y.gameId !== x.id)
+        ).map((data, i) => {
+          return (
+            <React.Fragment key={data.id}>
+              {i !== 0 && ", "}
+              <Emoji emoji={data.emoji} /> {data.name}
+            </React.Fragment>
+          );
+        })}
         <Space h={8} />
         {60 * 60 >= secondsUntilFreeze && secondsUntilFreeze > 60 && (
           <>
